@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: #f5f7fa;
+  color: #111827;
+}
+
+:root {
+  --bg: #f5f7fa;
+  --text: #111827;
+}
+
+[data-theme="dark"] {
+  --bg: #020617;
+  --text: #f9fafb;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Make the container take full viewport height and use flex column */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full viewport height */
+}
+
+/* Main content grows to fill available space */
+.content {
+  flex: 1;
+}
+
+/* Footer styling */
+footer {
+  background: #0f172a;
+  color: white;
+  text-align: center;
+  padding: 16px;
+}
+
