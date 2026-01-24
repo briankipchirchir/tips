@@ -76,7 +76,7 @@ const Home = () => {
       tip="Over 2.5"
       odds="1.85"
       level="GOLD"
-      userPlan="NONE"
+      userPlan={userPlan}
     />
 
     <PremiumTipCard
