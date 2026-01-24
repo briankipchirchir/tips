@@ -1,0 +1,147 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #020617;
+  color: white;
+}
+
+/* SIDEBAR */
+.admin-sidebar {
+  width: 220px;
+  background: #020617;
+  border-right: 1px solid #1e293b;
+  padding: 20px;
+}
+
+.admin-logo {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.admin-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-sidebar a {
+  color: #cbd5f5;
+  text-decoration: none;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.admin-sidebar a:hover {
+  background: #1e293b;
+}
+
+/* CONTENT */
+.admin-content {
+  flex: 1;
+  padding: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.stats-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.stats-title {
+  color: #94a3b8;
+}
+
+.stats-value {
+  font-size: 22px;
+  margin-top: 8px;
+}
+
+/* TABLE */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid #1e293b;
+  padding: 12px;
+  text-align: left;
+}
+
+.admin-table th {
+  color: #94a3b8;
+}
+
+/* BUTTONS */
+.btn-edit {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+.btn-delete {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+@media (max-width: 768px) {
+  .admin-page table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .stats-cards {
+    flex-direction: column;
+  }
+}
+
