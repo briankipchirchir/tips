@@ -11,6 +11,7 @@ const AdminSidebar = () => {
         <Link to="/admin/tips">Tips</Link>
         <Link to="/admin/premium">Premium Plans</Link>
         <Link to="/admin/value-bets">Value Bets</Link>
+        <Link to="/admin/payments">Payments</Link>
         <Link to="/">Back to Site</Link>
       </nav>
     </aside>

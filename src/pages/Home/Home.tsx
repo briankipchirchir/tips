@@ -32,7 +32,7 @@ const Home = () => {
         </div>
       </section>
 
-   <section className="section">
+   <section className="section" id="free-tips">
   <div className="section-header">
     <h2 className="section-title">Free Guaranteed Tips</h2>
   </div>
@@ -139,7 +139,7 @@ const Home = () => {
 
 
    {/* PREMIUM PLANS */}
-<section className="section dark">
+<section className="section dark" id="premium-tips">
   <h2 className="section-title" style={{color: '#10b981', fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem'}}>Premium Tips</h2>
 
   <div className="plans" style={{display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '800px', margin: '0 auto'}}>
