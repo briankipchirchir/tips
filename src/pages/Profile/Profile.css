@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap");
+
+.profile-page { min-height: 100vh; background: #020617; padding: 48px 16px 80px; font-family: "Sora", sans-serif; }
+.profile-inner { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+
+.profile-hero { display: flex; align-items: center; gap: 20px; }
+.profile-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 2rem; font-weight: 800; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.profile-name { color: #f1f5f9; font-size: 1.5rem; font-weight: 700; margin: 0 0 4px; }
+.profile-email { color: #64748b; font-size: 0.875rem; margin: 0 0 4px; }
+.profile-phone { color: #94a3b8; font-size: 0.875rem; margin: 0; }
+
+.profile-section { display: flex; flex-direction: column; gap: 14px; }
+.section-label { color: #475569; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0; padding-bottom: 4px; border-bottom: 1px solid #1e293b; }
+
+.sub-status-card { background: #0f172a; border: 1.5px solid #1e293b; border-left: 3px solid var(--plan-color, #334155); border-radius: 12px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.sub-badge { font-weight: 700; font-size: 1rem; display: block; margin-bottom: 4px; }
+.sub-odds { color: #64748b; font-size: 0.85rem; margin: 0 0 6px; }
+.sub-expiry { color: #64748b; font-size: 0.8rem; margin: 0; }
+.expiry-safe { color: #10b981; font-weight: 600; }
+.expiry-urgent { color: #f87171; font-weight: 600; }
+.active-pill { background: rgba(16,185,129,0.15); color: #10b981; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+.inactive-pill { background: rgba(100,116,139,0.15); color: #64748b; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+
+.profile-btn { display: block; text-align: center; text-decoration: none; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 10px; padding: 13px; font-size: 0.95rem; font-weight: 700; font-family: "Sora", sans-serif; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
+.profile-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.profile-btn-outline { display: block; text-align: center; text-decoration: none; background: transparent; color: #94a3b8; border: 1.5px solid #1e293b; border-radius: 10px; padding: 12px; font-size: 0.9rem; font-weight: 600; font-family: "Sora", sans-serif; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+.profile-btn-outline:hover { border-color: #10b981; color: #10b981; }
+.full-width { width: 100%; box-sizing: border-box; }
+
+.quick-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.quick-link-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 16px 10px; text-align: center; text-decoration: none; color: #94a3b8; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: border-color 0.2s, color 0.2s; }
+.quick-link-card:hover { border-color: #10b981; color: #10b981; }
+.ql-icon { font-size: 1.4rem; }
+
+.account-actions { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; }
+.action-row { width: 100%; background: transparent; border: none; border-bottom: 1px solid #1e293b; padding: 16px 20px; color: #94a3b8; font-family: "Sora", sans-serif; font-size: 0.9rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; text-align: left; }
+.action-row:last-child { border-bottom: none; }
+.action-row:hover { background: #162032; }
+.logout-row { color: #f87171; }
+.chevron { font-size: 1.2rem; color: #334155; }
+
+.profile-card.centered { max-width: 380px; margin: 80px auto; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; padding: 40px; text-align: center; }
+.profile-no-user { color: #64748b; margin-bottom: 20px; }
+
+@media (max-width: 520px) {
+  .quick-links { grid-template-columns: repeat(2, 1fr); }
+  .profile-hero { flex-direction: column; text-align: center; }
+}

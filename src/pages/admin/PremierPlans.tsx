@@ -1,117 +1,45 @@
-import AdminSidebar from '../../components/admin/AdminSidebar';
-import '../../styles/admin.css';
+import AdminLayout from "../../components/admin/AdminLayout";
 
-const PremiumPlans = () => {
-  const plans = [
-    {
-      id: 1,
-      name: 'BRONZE',
-      price: 50,
-      duration: '1 Week',
-      features: ['Basic Tips', 'Email Support'],
-      active: true,
-    },
-    {
-      id: 2,
-      name: 'SILVER',
-      price: 150,
-      duration: '1 Month',
-      features: ['Premium Tips', 'Priority Support', 'Value Bets'],
-      active: true,
-    },
-    {
-      id: 3,
-      name: 'GOLD',
-      price: 400,
-      duration: '3 Months',
-      features: ['All Premium Features', '24/7 Support', 'VIP Tips', 'Exclusive Analysis'],
-      active: true,
-    },
-  ];
+const PLANS = [
+  { level: "SILVER",   color: "#94a3b8", odds: "3–5",  prices: { "1day": 50, "3days": 120, "1week": 250, "1month": 800  }, subs: 120 },
+  { level: "GOLD",     color: "#f59e0b", odds: "5–7",  prices: { "1day": 70, "3days": 180, "1week": 380, "1month": 1200 }, subs: 158 },
+  { level: "PLATINUM", color: "#818cf8", odds: "8–15", prices: { "1day": 100,"3days": 250, "1week": 500, "1month": 1800 }, subs: 69  },
+];
 
-  return (
-    <div className="admin-layout">
-      <AdminSidebar />
-
-      <main className="admin-content">
-        <div className="dashboard-header">
-          <h1>Premium Plans</h1>
-          <button className="btn-primary">+ Add New Plan</button>
-        </div>
-
-        <div className="plans-grid">
-          {plans.map((plan) => (
-            <div key={plan.id} className="plan-card">
-              <div className="plan-header">
-                <h3>{plan.name}</h3>
-                <div className="plan-price">
-                  <span className="currency">KSH</span>
-                  <span className="amount">{plan.price}</span>
-                  <span className="duration">/{plan.duration}</span>
-                </div>
-              </div>
-
-              <div className="plan-features">
-                <h4>Features:</h4>
-                <ul>
-                  {plan.features.map((feature, index) => (
-                    <li key={index}>✓ {feature}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="plan-status">
-                <span className={`badge badge-${plan.active ? 'completed' : 'pending'}`}>
-                  {plan.active ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-
-              <div className="plan-actions">
-                <button className="btn-edit">Edit Plan</button>
-                <button className="btn-delete">
-                  {plan.active ? 'Deactivate' : 'Activate'}
-                </button>
-              </div>
+const PremiumPlans = () => (
+  <AdminLayout title="Premium Plans">
+    <div style={{ display: "grid", gap: 20 }}>
+      {PLANS.map((plan) => (
+        <div className="admin-section" key={plan.level}>
+          <div className="admin-section-header">
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ color: plan.color, fontWeight: 800, fontSize: "1rem" }}>{plan.level}</span>
+              <span className="badge badge-gray">{plan.subs} active subscribers</span>
+              <span className="badge badge-gray">{plan.odds} odds daily</span>
             </div>
-          ))}
+          </div>
+          <div className="admin-section-body">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr))", gap: 14 }}>
+              {Object.entries(plan.prices).map(([dur, price]) => (
+                <div key={dur} style={{ background: "#162032", borderRadius: 10, padding: "14px 16px" }}>
+                  <div style={{ color: "#64748b", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+                    {dur === "1day" ? "1 Day" : dur === "3days" ? "3 Days" : dur === "1week" ? "1 Week" : "1 Month"}
+                  </div>
+                  <div style={{ color: plan.color, fontSize: "1.5rem", fontWeight: 800 }}>KSH {price}</div>
+                  <div style={{ color: "#475569", fontSize: "0.75rem", marginTop: 4 }}>per period</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.12)", borderRadius: 8 }}>
+              <p style={{ color: "#6ee7b7", fontSize: "0.8rem", margin: 0 }}>
+                💡 Prices will be editable via the backend API once connected. Updates will automatically reflect on the Subscribe page.
+              </p>
+            </div>
+          </div>
         </div>
-
-        <section className="admin-section" style={{ marginTop: '2rem' }}>
-          <h2>Plan Statistics</h2>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Plan</th>
-                <th>Active Subscribers</th>
-                <th>Monthly Revenue</th>
-                <th>Conversion Rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>BRONZE</td>
-                <td>45</td>
-                <td>KSH 2,250</td>
-                <td>12%</td>
-              </tr>
-              <tr>
-                <td>SILVER</td>
-                <td>78</td>
-                <td>KSH 11,700</td>
-                <td>18%</td>
-              </tr>
-              <tr>
-                <td>GOLD</td>
-                <td>34</td>
-                <td>KSH 13,600</td>
-                <td>8%</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      </main>
+      ))}
     </div>
-  );
-};
+  </AdminLayout>
+);
 
 export default PremiumPlans;

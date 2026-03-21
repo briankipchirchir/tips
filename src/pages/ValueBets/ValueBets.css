@@ -1,0 +1,392 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap");
+
+.vb-page {
+  min-height: 100vh;
+  background: #020617;
+  padding: 48px 16px 80px;
+  font-family: "Sora", sans-serif;
+}
+
+.vb-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Header */
+.vb-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.vb-eyebrow {
+  color: #10b981;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.vb-header h1 {
+  color: #f1f5f9;
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.vb-header p {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Tab Nav */
+.vb-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.vb-tab {
+  background: #0f172a;
+  border: 1.5px solid #1e293b;
+  color: #64748b;
+  padding: 9px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: "Sora", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: block;
+}
+
+.vb-tab:hover {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.vb-tab.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+/* Lock Banner */
+.vb-lock-banner {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 14px;
+  padding: 24px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.vb-lock-banner h3 {
+  color: #f1f5f9;
+  font-size: 1rem;
+  margin: 0 0 4px;
+}
+
+.vb-lock-banner p {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.vb-subscribe-btn {
+  background: #10b981;
+  color: white;
+  text-decoration: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.vb-subscribe-btn:hover {
+  opacity: 0.88;
+}
+
+/* Jackpot Info Bar */
+.vb-info-bar {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.vb-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vb-info-label {
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.vb-info-value {
+  color: #f1f5f9;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.vb-info-value.green {
+  color: #10b981;
+}
+
+/* Predictions list */
+.vb-predictions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vb-card {
+  background: #0f172a;
+  border: 1.5px solid #1e293b;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.vb-card:hover {
+  border-color: #334155;
+  transform: translateY(-2px);
+}
+
+.vb-card-main {
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.vb-match-info {}
+
+.vb-match-num {
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.vb-league-date {
+  color: #64748b;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+
+.vb-fixture {
+  color: #f1f5f9;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.vb-pick-box {
+  background: #162032;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+}
+
+.vb-pick-label {
+  color: #475569;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.vb-pick-value {
+  color: #10b981;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.vb-odds-box {
+  text-align: center;
+}
+
+.vb-odds-label {
+  color: #475569;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.vb-odds-value {
+  color: #f59e0b;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.vb-conf-box {
+  text-align: center;
+}
+
+.vb-conf-label {
+  color: #475569;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.vb-conf-bar {
+  background: #1e293b;
+  border-radius: 20px;
+  height: 6px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.vb-conf-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.vb-conf-pct {
+  color: #10b981;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* Analysis row */
+.vb-card-analysis {
+  padding: 12px 20px;
+  border-top: 1px solid #1e293b;
+  background: rgba(16, 185, 129, 0.03);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.vb-analysis-icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.vb-analysis-text {
+  color: #64748b;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+/* Locked state */
+.vb-predictions.locked .vb-card:nth-child(n+3) {
+  position: relative;
+  overflow: hidden;
+}
+
+.vb-predictions.locked .vb-card:nth-child(n+3) .vb-card-main,
+.vb-predictions.locked .vb-card:nth-child(n+3) .vb-card-analysis {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.vb-card-lock-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.vb-card-lock-overlay span {
+  font-size: 1.1rem;
+}
+
+.vb-card-lock-overlay a {
+  background: #10b981;
+  color: white;
+  text-decoration: none;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* Empty state */
+.vb-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #475569;
+}
+
+.vb-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.vb-empty h3 {
+  color: #64748b;
+  font-size: 1.1rem;
+  margin: 0 0 6px;
+}
+
+.vb-empty p {
+  font-size: 0.875rem;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .vb-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .vb-card-main {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .vb-match-info {
+    grid-column: 1 / -1;
+  }
+
+  .vb-lock-banner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .vb-subscribe-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .vb-info-bar {
+    gap: 14px;
+  }
+}

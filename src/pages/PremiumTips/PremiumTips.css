@@ -1,0 +1,57 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap");
+
+.premium-tips-page { min-height: 100vh; background: #020617; padding: 48px 16px 80px; font-family: "Sora", sans-serif; }
+.pt-inner { max-width: 1100px; margin: 0 auto; }
+.pt-header { text-align: center; margin-bottom: 32px; }
+.pt-eyebrow { color: #10b981; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.pt-header h1 { color: #f1f5f9; font-size: 2.25rem; font-weight: 800; margin: 0 0 6px; }
+.pt-date { color: #64748b; font-size: 0.875rem; }
+
+.access-banner { border-radius: 14px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+.locked-banner { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+.active-banner { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); }
+.banner-title { color: #f1f5f9; font-weight: 700; margin: 0 0 4px; font-size: 0.95rem; }
+.banner-desc { color: #64748b; font-size: 0.82rem; margin: 0; }
+.banner-btn { background: #10b981; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 0.875rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; transition: opacity 0.2s; }
+.banner-btn:hover { opacity: 0.88; }
+.banner-btn-outline { background: transparent; color: #10b981; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 0.875rem; font-weight: 700; border: 1.5px solid #10b981; white-space: nowrap; flex-shrink: 0; transition: background 0.2s; }
+.banner-btn-outline:hover { background: rgba(16,185,129,0.1); }
+
+.league-filter { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+.league-tab { background: #0f172a; border: 1.5px solid #1e293b; color: #64748b; padding: 7px 16px; border-radius: 20px; cursor: pointer; font-family: "Sora", sans-serif; font-size: 0.8rem; font-weight: 600; transition: all 0.2s; }
+.league-tab.active { background: #1e293b; border-color: #10b981; color: #10b981; }
+.league-tab:hover:not(.active) { color: #94a3b8; border-color: #334155; }
+
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+
+.tip-card { background: #0f172a; border: 1.5px solid #1e293b; border-top: 3px solid var(--level-color, #334155); border-radius: 14px; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+.tip-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.tip-card-inner { padding: 20px; }
+
+.tip-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.tip-level-badge { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; border: 1.5px solid; padding: 2px 8px; border-radius: 20px; }
+.tip-time { color: #64748b; font-size: 0.8rem; font-weight: 600; }
+.tip-league { color: #64748b; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 4px; }
+.tip-fixture { color: #f1f5f9; font-size: 1rem; font-weight: 700; margin: 0 0 16px; line-height: 1.35; }
+
+.tip-details { background: #162032; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+.tip-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; border-bottom: 1px solid #1e293b; }
+.tip-detail-row:last-child { border-bottom: none; }
+.detail-label { color: #64748b; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.detail-value { color: #f1f5f9; font-size: 0.9rem; font-weight: 700; }
+.detail-value.accent { color: #10b981; }
+.tip-analysis { color: #64748b; font-size: 0.8rem; line-height: 1.6; margin: 0; background: rgba(16,185,129,0.05); border-left: 2px solid #10b981; padding: 8px 10px; border-radius: 0 6px 6px 0; }
+
+.tip-lock-overlay { position: absolute; inset: 0; background: rgba(2,6,23,0.82); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; }
+.lock-content { text-align: center; padding: 16px; }
+.lock-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+.lock-plan { color: #94a3b8; font-size: 0.85rem; margin: 0 0 12px; }
+.lock-btn { display: inline-block; background: #10b981; color: white; text-decoration: none; padding: 9px 18px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; transition: opacity 0.2s; }
+.lock-btn:hover { opacity: 0.88; }
+
+@media (max-width: 640px) {
+  .pt-header h1 { font-size: 1.75rem; }
+  .tips-grid { grid-template-columns: 1fr; }
+  .access-banner { flex-direction: column; text-align: center; }
+  .banner-btn, .banner-btn-outline { width: 100%; text-align: center; }
+}

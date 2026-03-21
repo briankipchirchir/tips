@@ -1,27 +1,16 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./Navbar.css";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const location = useLocation();
+  const { user, userPlan } = useAuth();
 
-  const scrollToSection = (id: string) => {
-    setOpen(false);
-
-    // If not on home, navigate first
-    if (location.pathname !== "/") {
-      window.location.href = `/#${id}`;
-      return;
-    }
-
-    const section = document.getElementById(id);
-    section?.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <nav className="navbar">
-      <h2 className="logo">BetTips</h2>
+      <Link to="/" className="logo" onClick={() => setOpen(false)}>BetTips</Link>
 
       <ul className={`nav-links ${open ? "open" : ""}`}>
         <li>
@@ -29,29 +18,53 @@ const Navbar = () => {
         </li>
 
         <li>
-          <button className="nav-btn" onClick={() => scrollToSection("free-tips")}>
-            Free Tips
-          </button>
+          <Link to="/free-tips" onClick={() => setOpen(false)}>Free Tips</Link>
         </li>
 
         <li>
-          <button className="nav-btn premium" onClick={() => scrollToSection("premium-tips")}>
+          <Link to="/premium-tips" className="nav-btn premium" onClick={() => setOpen(false)}>
             Premium
-          </button>
+          </Link>
         </li>
 
         <li>
-          <Link to="/login" onClick={() => setOpen(false)}>Login</Link>
+          <Link to="/subscribe" className="nav-btn subscribe-btn" onClick={() => setOpen(false)}>
+            Subscribe
+          </Link>
         </li>
+
+        {user ? (
+          <>
+            {userPlan && userPlan !== "NONE" && (
+              <li>
+                <span className="plan-badge">{userPlan}</span>
+              </li>
+            )}
+            <li>
+              <Link to="/profile" className="nav-avatar" onClick={() => setOpen(false)}>
+                {user.fullName.charAt(0).toUpperCase()}
+              </Link>
+            </li>
+          </>
+        ) : (
+          <>
+            <li>
+              <Link to="/login" onClick={() => setOpen(false)}>Login</Link>
+            </li>
+            <li>
+              <Link to="/register" className="nav-register-btn" onClick={() => setOpen(false)}>
+                Register
+              </Link>
+            </li>
+          </>
+        )}
       </ul>
 
       <div className="hamburger" onClick={() => setOpen(!open)}>
-        ☰
+        {open ? "✕" : "☰"}
       </div>
     </nav>
   );
 };
 
 export default Navbar;
-
-

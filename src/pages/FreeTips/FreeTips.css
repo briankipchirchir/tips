@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap");
+
+.free-tips-page { min-height: 100vh; background: #020617; padding: 48px 16px 80px; font-family: "Sora", sans-serif; }
+.ft-inner { max-width: 900px; margin: 0 auto; }
+.ft-header { text-align: center; margin-bottom: 32px; }
+.ft-eyebrow { color: #10b981; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.ft-header h1 { color: #f1f5f9; font-size: 2.25rem; font-weight: 800; margin: 0 0 8px; }
+.ft-sub { color: #64748b; font-size: 0.95rem; }
+
+.stats-row { display: flex; justify-content: center; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+.stat-chip { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px 24px; text-align: center; min-width: 110px; }
+.stat-num { display: block; color: #10b981; font-size: 1.4rem; font-weight: 800; margin-bottom: 2px; }
+.stat-label { color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+.day-tabs { display: flex; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 4px; margin-bottom: 24px; gap: 4px; }
+.day-tab { flex: 1; background: transparent; border: none; color: #64748b; padding: 10px; border-radius: 9px; cursor: pointer; font-family: "Sora", sans-serif; font-size: 0.875rem; font-weight: 600; transition: all 0.2s; }
+.day-tab.active { background: #1e293b; color: #10b981; }
+.day-tab:hover:not(.active) { color: #94a3b8; }
+
+.ft-table-wrapper { display: block; overflow-x: auto; border-radius: 14px; border: 1px solid #1e293b; margin-bottom: 24px; }
+.ft-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.ft-table th { background: #0c1526; color: #64748b; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 14px 16px; text-align: left; white-space: nowrap; }
+.ft-table td { padding: 14px 16px; border-top: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
+.ft-table tbody tr:hover { background: #0f172a; }
+.td-time { color: #64748b !important; font-size: 0.85rem; white-space: nowrap; }
+.td-fixture { font-weight: 600; color: #f1f5f9 !important; }
+.td-tip { color: #10b981 !important; font-weight: 700; }
+
+.league-pill { background: #162032; color: #64748b; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.status-pill { padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+.status-won { background: rgba(16,185,129,0.12); color: #10b981; }
+.status-lost { background: rgba(239,68,68,0.12); color: #f87171; }
+.status-pending { background: rgba(245,158,11,0.12); color: #f59e0b; }
+
+.ft-cards { display: none; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.ft-tip-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; }
+.ftc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.ftc-time { color: #64748b; font-size: 0.8rem; }
+.ftc-fixture { color: #f1f5f9; font-size: 0.95rem; font-weight: 700; margin: 0 0 10px; }
+.ftc-bottom { display: flex; justify-content: space-between; align-items: center; }
+.ftc-tip { color: #10b981; font-size: 0.85rem; font-weight: 700; }
+
+.upgrade-cta { background: linear-gradient(135deg, #0c2a1e, #0f172a); border: 1px solid rgba(16,185,129,0.2); border-radius: 16px; padding: 24px 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+.cta-content h3 { color: #f1f5f9; margin: 0 0 4px; font-size: 1rem; }
+.cta-content p { color: #64748b; font-size: 0.85rem; margin: 0; }
+.cta-btn { background: #10b981; color: white; text-decoration: none; padding: 11px 22px; border-radius: 9px; font-size: 0.875rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; transition: opacity 0.2s; }
+.cta-btn:hover { opacity: 0.88; }
+
+@media (max-width: 640px) {
+  .ft-header h1 { font-size: 1.75rem; }
+  .ft-table-wrapper { display: none; }
+  .ft-cards { display: flex; }
+  .upgrade-cta { flex-direction: column; text-align: center; }
+  .cta-btn { width: 100%; text-align: center; }
+}
