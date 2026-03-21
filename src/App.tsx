@@ -22,6 +22,7 @@ import CorrectScore from './pages/ValueBets/CorrectScore';
 import GoalRange from './pages/ValueBets/GoalRange';
 import PremiumPlans from './pages/admin/PremierPlans';
 
+import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from './context/AuthContext';
 import { TipsProvider } from './context/TipsCotext';
 import { UsersProvider } from './context/UserContext';
@@ -37,6 +38,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => (
 function App() {
   return (
     <AuthProvider>
+        <ScrollToTop />
       <TipsProvider>
         <UsersProvider>
           <Routes>
