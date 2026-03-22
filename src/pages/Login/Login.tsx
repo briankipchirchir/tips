@@ -7,7 +7,7 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,10 +17,10 @@ const Login = () => {
     setError("");
     setLoading(true);
     try {
-      await login(email, password);
+      await login(phone, password);
       navigate("/");
-    } catch {
-      setError("Invalid email or password. Please try again.");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Invalid phone or password.");
     } finally {
       setLoading(false);
     }
@@ -40,14 +40,17 @@ const Login = () => {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="field-group">
-            <label>Email Address</label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              required
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setError(""); }}
-            />
+            <label>Phone Number</label>
+            <div className="phone-input-wrapper">
+              <span className="phone-prefix">🇰🇪 +254</span>
+              <input
+                type="tel"
+                placeholder="7XX XXX XXX"
+                required
+                value={phone}
+                onChange={(e) => { setPhone(e.target.value); setError(""); }}
+              />
+            </div>
           </div>
 
           <div className="field-group">
@@ -71,9 +74,7 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="login-divider">
-          <span>or</span>
-        </div>
+        <div className="login-divider"><span>or</span></div>
 
         <div className="login-actions">
           <p className="login-footer">

@@ -1,46 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { tipsApi } from "../../services/api";
 import "./FreeTips.css";
 
 type Day = "yesterday" | "today" | "tomorrow";
 
-interface FreeTip {
-  time: string;
+interface Tip {
+  id: string;
   league: string;
   fixture: string;
-  tip: string;
-  status?: "won" | "lost" | "pending";
+  prediction: string;
+  odds: string;
+  kickoffTime: string;
 }
 
-const TIPS: Record<Day, FreeTip[]> = {
-  yesterday: [
-    { time: "15:00", league: "EPL", fixture: "Man Utd vs Everton", tip: "Home Win", status: "won" },
-    { time: "17:30", league: "La Liga", fixture: "Barcelona vs Sevilla", tip: "BTTS", status: "won" },
-    { time: "20:00", league: "Serie A", fixture: "Juventus vs Lazio", tip: "Over 2.5", status: "lost" },
-  ],
-  today: [
-    { time: "14:00", league: "EPL", fixture: "Man City vs Wolves", tip: "Over 2.5", status: "pending" },
-    { time: "16:30", league: "Bundesliga", fixture: "Bayern vs Dortmund", tip: "Home Win", status: "pending" },
-    { time: "19:45", league: "UCL", fixture: "Real Madrid vs City", tip: "BTTS", status: "pending" },
-    { time: "21:00", league: "KPL", fixture: "Gor Mahia vs AFC", tip: "Over 1.5", status: "pending" },
-  ],
-  tomorrow: [
-    { time: "13:30", league: "EPL", fixture: "Arsenal vs Tottenham", tip: "Home Win" },
-    { time: "16:00", league: "La Liga", fixture: "Real Madrid vs Valencia", tip: "Over 2.5" },
-    { time: "19:30", league: "Serie A", fixture: "Inter vs Roma", tip: "BTTS" },
-  ],
-};
-
-const STATUS_MAP = {
-  won: { label: "✓ Won", class: "status-won" },
-  lost: { label: "✗ Lost", class: "status-lost" },
-  pending: { label: "⏳ Pending", class: "status-pending" },
+const getDate = (day: Day): string => {
+  const d = new Date();
+  if (day === "yesterday") d.setDate(d.getDate() - 1);
+  if (day === "tomorrow")  d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
 };
 
 const FreeTips = () => {
   const [activeDay, setActiveDay] = useState<Day>("today");
-  const tips = TIPS[activeDay];
-  const wonCount = TIPS.yesterday.filter((t) => t.status === "won").length;
-  const totalYesterday = TIPS.yesterday.length;
+  const [tips, setTips] = useState<Tip[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    tipsApi.getFreeTips(getDate(activeDay))
+      .then((res) => setTips(res.data))
+      .catch(() => setTips([]))
+      .finally(() => setLoading(false));
+  }, [activeDay]);
 
   return (
     <div className="free-tips-page">
@@ -52,58 +43,65 @@ const FreeTips = () => {
         </div>
 
         <div className="stats-row">
-          <div className="stat-chip"><span className="stat-num">{wonCount}/{totalYesterday}</span><span className="stat-label">Yesterday's wins</span></div>
+          <div className="stat-chip"><span className="stat-num">{tips.length}</span><span className="stat-label">Tips today</span></div>
           <div className="stat-chip"><span className="stat-num">90%+</span><span className="stat-label">Accuracy rate</span></div>
           <div className="stat-chip"><span className="stat-num">Daily</span><span className="stat-label">Tips updated</span></div>
         </div>
 
         <div className="day-tabs">
           {(["yesterday", "today", "tomorrow"] as Day[]).map((d) => (
-            <button key={d} className={`day-tab ${activeDay === d ? "active" : ""}`} onClick={() => setActiveDay(d)}>
+            <button key={d} className={`day-tab ${activeDay === d ? "active" : ""}`}
+              onClick={() => setActiveDay(d)}>
               {d.charAt(0).toUpperCase() + d.slice(1)}
             </button>
           ))}
         </div>
 
-        <div className="ft-table-wrapper">
-          <table className="ft-table">
-            <thead>
-              <tr>
-                <th>Time</th><th>League</th><th>Fixture</th><th>Prediction</th>
-                {(activeDay === "yesterday" || activeDay === "today") && <th>Status</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {tips.map((tip, i) => (
-                <tr key={i}>
-                  <td className="td-time">{tip.time}</td>
-                  <td><span className="league-pill">{tip.league}</span></td>
-                  <td className="td-fixture">{tip.fixture}</td>
-                  <td className="td-tip">{tip.tip}</td>
-                  {tip.status && (
-                    <td><span className={`status-pill ${STATUS_MAP[tip.status].class}`}>{STATUS_MAP[tip.status].label}</span></td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="ft-cards">
-          {tips.map((tip, i) => (
-            <div className="ft-tip-card" key={i}>
-              <div className="ftc-top">
-                <span className="league-pill">{tip.league}</span>
-                <span className="ftc-time">{tip.time}</span>
-              </div>
-              <h3 className="ftc-fixture">{tip.fixture}</h3>
-              <div className="ftc-bottom">
-                <span className="ftc-tip">🎯 {tip.tip}</span>
-                {tip.status && <span className={`status-pill ${STATUS_MAP[tip.status].class}`}>{STATUS_MAP[tip.status].label}</span>}
-              </div>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>Loading tips...</div>
+        ) : tips.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+            <p style={{ fontSize: "2rem" }}>⚽</p>
+            <p>No tips available for this day yet. Check back later!</p>
+          </div>
+        ) : (
+          <>
+            <div className="ft-table-wrapper">
+              <table className="ft-table">
+                <thead>
+                  <tr><th>Time</th><th>League</th><th>Fixture</th><th>Prediction</th><th>Odds</th></tr>
+                </thead>
+                <tbody>
+                  {tips.map((tip) => (
+                    <tr key={tip.id}>
+                      <td className="td-time">{tip.kickoffTime}</td>
+                      <td><span className="league-pill">{tip.league}</span></td>
+                      <td className="td-fixture">{tip.fixture}</td>
+                      <td className="td-tip">{tip.prediction}</td>
+                      <td style={{ color: "#f59e0b", fontWeight: 700 }}>{tip.odds || "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
+
+            <div className="ft-cards">
+              {tips.map((tip) => (
+                <div className="ft-tip-card" key={tip.id}>
+                  <div className="ftc-top">
+                    <span className="league-pill">{tip.league}</span>
+                    <span className="ftc-time">{tip.kickoffTime}</span>
+                  </div>
+                  <h3 className="ftc-fixture">{tip.fixture}</h3>
+                  <div className="ftc-bottom">
+                    <span className="ftc-tip">🎯 {tip.prediction}</span>
+                    {tip.odds && <span style={{ color: "#f59e0b", fontWeight: 700 }}>@ {tip.odds}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
         <div className="upgrade-cta">
           <div className="cta-content">

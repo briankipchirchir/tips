@@ -1,75 +1,114 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
+import { authApi, userApi } from "../services/api";
 
 type PlanLevel = "FREE" | "SILVER" | "GOLD" | "PLATINUM" | "NONE";
 type Duration = "1day" | "3days" | "1week" | "1month";
 
 interface UserData {
+  id: string;
   fullName: string;
-  email: string;
   phone: string;
+  smsNumber: string;
+  role: string;
+  activeSubscription?: {
+    planLevel: PlanLevel;
+    endDate: string;
+    active: boolean;
+  } | null;
 }
 
 interface AuthContextType {
   user: UserData | null;
   userPlan: PlanLevel;
   subscriptionExpiry: string | null;
-  login: (email: string, password: string) => void;
-  register: (fullName: string, email: string, phone: string, password: string) => Promise<void>;
+  loading: boolean;
+  login: (phone: string, password: string) => Promise<void>;
+  register: (fullName: string, phone: string, password: string, smsNumber?: string) => Promise<void>;
   logout: () => void;
   subscribe: (plan: PlanLevel, duration: Duration) => void;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const DURATION_DAYS: Record<Duration, number> = {
-  "1day": 1,
-  "3days": 3,
-  "1week": 7,
-  "1month": 30,
-};
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserData | null>(null);
-  const [userPlan, setUserPlan] = useState<PlanLevel>("NONE");
-  const [subscriptionExpiry, setSubscriptionExpiry] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = (email: string, _password: string) => {
-    // TODO: Replace with Keycloak authentication
-    setUser({ fullName: "John Kamau", email, phone: "0712345678" });
-    setUserPlan("NONE");
+  const userPlan: PlanLevel = user?.activeSubscription?.active
+    ? (user.activeSubscription.planLevel as PlanLevel)
+    : "NONE";
+
+  const subscriptionExpiry = user?.activeSubscription?.endDate ?? null;
+
+  // On mount — restore session from localStorage
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      userApi.getProfile()
+        .then((res) => setUser(res.data))
+        .catch(() => {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const login = async (phone: string, password: string) => {
+    const res = await authApi.login({ phone, password });
+    localStorage.setItem("accessToken", res.data.accessToken);
+    localStorage.setItem("refreshToken", res.data.refreshToken);
+    setUser(res.data.user);
   };
 
   const register = async (
     fullName: string,
-    email: string,
     phone: string,
-    _password: string
-  ): Promise<void> => {
-    // TODO: Replace with Keycloak registration API call
-    await new Promise((r) => setTimeout(r, 800));
-    setUser({ fullName, email, phone });
-    setUserPlan("NONE");
+    password: string,
+    smsNumber?: string
+  ) => {
+    const res = await authApi.register({
+      fullName,
+      phone,
+      smsNumber: smsNumber || phone,
+      password,
+    });
+    localStorage.setItem("accessToken", res.data.accessToken);
+    localStorage.setItem("refreshToken", res.data.refreshToken);
+    setUser(res.data.user);
   };
 
   const logout = () => {
+    authApi.logout().catch(() => {});
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     setUser(null);
-    setUserPlan("NONE");
-    setSubscriptionExpiry(null);
   };
 
-  const subscribe = (plan: PlanLevel, duration: Duration) => {
-    const days = DURATION_DAYS[duration];
-    const expiry = new Date();
-    expiry.setDate(expiry.getDate() + days);
-    setUserPlan(plan);
-    setSubscriptionExpiry(expiry.toISOString());
+  const subscribe = (_plan: PlanLevel, _duration: Duration) => {
+    // Called after successful M-Pesa payment
+    // Refresh profile to get updated subscription from backend
+    refreshProfile();
+  };
+
+  const refreshProfile = async () => {
+    try {
+      const res = await userApi.getProfile();
+      setUser(res.data);
+    } catch (e) {
+      console.error("Failed to refresh profile", e);
+    }
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, userPlan, subscriptionExpiry, login, register, logout, subscribe }}
-    >
+    <AuthContext.Provider value={{
+      user, userPlan, subscriptionExpiry, loading,
+      login, register, logout, subscribe, refreshProfile
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -9,7 +9,6 @@ const Register = () => {
 
   const [form, setForm] = useState({
     fullName: "",
-    email: "",
     phone: "",
     password: "",
     confirmPassword: "",
@@ -34,10 +33,10 @@ const Register = () => {
     }
     setLoading(true);
     try {
-      await register(form.fullName, form.email, form.phone, form.password);
+      await register(form.fullName, form.phone, form.password);
       navigate("/");
-    } catch {
-      setError("Registration failed. Please try again.");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -57,30 +56,29 @@ const Register = () => {
         <form className="register-form" onSubmit={handleSubmit}>
           <div className="field-group">
             <label>Full Name</label>
-            <input name="fullName" type="text" placeholder="John Kamau" required value={form.fullName} onChange={handleChange} />
-          </div>
-
-          <div className="field-group">
-            <label>Email Address</label>
-            <input name="email" type="email" placeholder="you@example.com" required value={form.email} onChange={handleChange} />
+            <input name="fullName" type="text" placeholder="John Kamau"
+              required value={form.fullName} onChange={handleChange} />
           </div>
 
           <div className="field-group">
             <label>Phone Number</label>
             <div className="phone-input-wrapper">
               <span className="phone-prefix">🇰🇪 +254</span>
-              <input name="phone" type="tel" placeholder="7XX XXX XXX" required value={form.phone} onChange={handleChange} />
+              <input name="phone" type="tel" placeholder="7XX XXX XXX"
+                required value={form.phone} onChange={handleChange} />
             </div>
           </div>
 
           <div className="field-row">
             <div className="field-group">
               <label>Password</label>
-              <input name="password" type="password" placeholder="Min. 8 characters" required minLength={8} value={form.password} onChange={handleChange} />
+              <input name="password" type="password" placeholder="Min. 4 characters"
+                required minLength={4} value={form.password} onChange={handleChange} />
             </div>
             <div className="field-group">
               <label>Confirm Password</label>
-              <input name="confirmPassword" type="password" placeholder="Repeat password" required value={form.confirmPassword} onChange={handleChange} />
+              <input name="confirmPassword" type="password" placeholder="Repeat password"
+                required value={form.confirmPassword} onChange={handleChange} />
             </div>
           </div>
 
