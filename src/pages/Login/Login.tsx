@@ -12,19 +12,24 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      await login(phone, password);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
+  try {
+    const userData = await login(phone, password);
+    // Route based on role
+    if (userData.role === 'ADMIN') {
+      navigate("/admin");
+    } else {
       navigate("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Invalid phone or password.");
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err: any) {
+    setError(err.response?.data?.message || "Invalid phone or password.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="login-page">

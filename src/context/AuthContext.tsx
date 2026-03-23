@@ -23,7 +23,8 @@ interface AuthContextType {
   userPlan: PlanLevel;
   subscriptionExpiry: string | null;
   loading: boolean;
-  login: (phone: string, password: string) => Promise<void>;
+
+login: (phone: string, password: string) => Promise<UserData>;  // was Promise<void>
   register: (fullName: string, phone: string, password: string, smsNumber?: string) => Promise<void>;
   logout: () => void;
   subscribe: (plan: PlanLevel, duration: Duration) => void;
@@ -63,6 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("accessToken", res.data.accessToken);
     localStorage.setItem("refreshToken", res.data.refreshToken);
     setUser(res.data.user);
+     return res.data.user; 
   };
 
   const register = async (

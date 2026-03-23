@@ -26,6 +26,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from './context/AuthContext';
 import { TipsProvider } from './context/TipsCotext';
 import { UsersProvider } from './context/UserContext';
+import AdminRoute from './components/AdminRoutes';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => (
   <div className="app-container">
@@ -54,12 +55,12 @@ function App() {
             <Route path="/value-bets/correct-score" element={<MainLayout><CorrectScore /></MainLayout>} />
             <Route path="/value-bets/goal-range" element={<MainLayout><GoalRange /></MainLayout>} />
 
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<UsersManagement />} />
-            <Route path="/admin/tips" element={<TipsManagement />} />
-            <Route path="/admin/premium" element={<PremiumPlans />} />
-            <Route path="/admin/value-bets" element={<ValueBets />} />
-            <Route path="/admin/payments" element={<Payments />} />
+            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+<Route path="/admin/users" element={<AdminRoute><UsersManagement /></AdminRoute>} />
+<Route path="/admin/tips" element={<AdminRoute><TipsManagement /></AdminRoute>} />
+<Route path="/admin/premium" element={<AdminRoute><PremiumPlans /></AdminRoute>} />
+<Route path="/admin/value-bets" element={<AdminRoute><ValueBets /></AdminRoute>} />
+<Route path="/admin/payments" element={<AdminRoute><Payments /></AdminRoute>} />
           </Routes>
         </UsersProvider>
       </TipsProvider>
