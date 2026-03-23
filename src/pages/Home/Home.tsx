@@ -1,19 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Home.css";
-import PremiumTipCard from "../../components/premium/PremiumTipCard";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { tipsApi } from "../../services/api";
+
+interface Tip {
+  id: string;
+  league: string;
+  fixture: string;
+  prediction: string;
+  odds: string;
+  kickoffTime: string;
+  level: string;
+}
 
 const Home = () => {
   const [activeDay, setActiveDay] = useState<"yesterday" | "today" | "tomorrow">("today");
   const [openPlan, setOpenPlan] = useState<string | null>(null);
   const [wonTipsFilter, setWonTipsFilter] = useState<"yesterday" | "today" | "week">("today");
+  const [freeTips, setFreeTips] = useState<Tip[]>([]);
+  const [premiumTips, setPremiumTips] = useState<Tip[]>([]);
+  const [tipsLoading, setTipsLoading] = useState(true);
 
-  const { userPlan } = useAuth();
+  const { userPlan, user } = useAuth();
   const navigate = useNavigate();
+
+  const getDate = (day: "yesterday" | "today" | "tomorrow") => {
+    const d = new Date();
+    if (day === "yesterday") d.setDate(d.getDate() - 1);
+    if (day === "tomorrow") d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+  };
+
+  // Fetch free tips when day changes
+  useEffect(() => {
+    setTipsLoading(true);
+    tipsApi.getFreeTips(getDate(activeDay))
+      .then((res) => setFreeTips(res.data))
+      .catch(() => setFreeTips([]))
+      .finally(() => setTipsLoading(false));
+  }, [activeDay]);
+
+  // Fetch premium tips preview on mount
+  useEffect(() => {
+    tipsApi.getPremiumTips()
+      .then((res) => setPremiumTips(res.data.slice(0, 3)))
+      .catch(() => setPremiumTips([]));
+  }, []);
 
   const togglePlan = (plan: string) => {
     setOpenPlan(openPlan === plan ? null : plan);
+  };
+
+  const LEVEL_COLOR: Record<string, string> = {
+    FREE: "#10b981", SILVER: "#94a3b8", GOLD: "#f59e0b", PLATINUM: "#818cf8",
   };
 
   return (
@@ -22,16 +62,10 @@ const Home = () => {
       <section className="hero">
         <p className="hero-tag">Welcome to BetTips</p>
         <h1>Your Ultimate Source for Accurate Football Predictions</h1>
-        <p className="hero-sub">
-          Expert analysis, reliable tips, and daily winning strategies.
-        </p>
+        <p className="hero-sub">Expert analysis, reliable tips, and daily winning strategies.</p>
         <div className="hero-buttons">
-          <button className="btn-primary" onClick={() => navigate("/free-tips")}>
-            View Free Tips
-          </button>
-          <button className="btn-outline" onClick={() => navigate("/subscribe")}>
-            Subscribe Now
-          </button>
+          <button className="btn-primary" onClick={() => navigate("/free-tips")}>View Free Tips</button>
+          <button className="btn-outline" onClick={() => navigate("/subscribe")}>Subscribe Now</button>
         </div>
       </section>
 
@@ -45,79 +79,39 @@ const Home = () => {
         </div>
 
         <div className="filters">
-          <button
-            className={activeDay === "yesterday" ? "active" : ""}
-            onClick={() => setActiveDay("yesterday")}
-          >
-            Yesterday
-          </button>
-          <button
-            className={activeDay === "today" ? "active" : ""}
-            onClick={() => setActiveDay("today")}
-          >
-            Today
-          </button>
-          <button
-            className={activeDay === "tomorrow" ? "active" : ""}
-            onClick={() => setActiveDay("tomorrow")}
-          >
-            Tomorrow
-          </button>
+          {(["yesterday", "today", "tomorrow"] as const).map((d) => (
+            <button key={d} className={activeDay === d ? "active" : ""} onClick={() => setActiveDay(d)}>
+              {d.charAt(0).toUpperCase() + d.slice(1)}
+            </button>
+          ))}
         </div>
 
-        <table className="tips-table">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>League</th>
-              <th>Fixture</th>
-              <th>Tip</th>
-            </tr>
-          </thead>
-          <tbody>
-            {activeDay === "today" && (
-              <tr>
-                <td>18:00</td>
-                <td>EPL</td>
-                <td>Man City vs Wolves</td>
-                <td>Over 2.5</td>
-              </tr>
-            )}
-            {activeDay === "yesterday" && (
-              <tr>
-                <td>20:00</td>
-                <td>La Liga</td>
-                <td>Barcelona vs Sevilla</td>
-                <td>BTTS</td>
-              </tr>
-            )}
-            {activeDay === "tomorrow" && (
-              <tr>
-                <td>19:30</td>
-                <td>Serie A</td>
-                <td>Inter vs Roma</td>
-                <td>Home Win</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        {tipsLoading ? (
+          <p style={{ textAlign: 'center', color: '#64748b', padding: '20px' }}>Loading tips...</p>
+        ) : freeTips.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#64748b', padding: '20px' }}>
+            No free tips available for this day yet.
+          </p>
+        ) : (
+          <table className="tips-table">
+            <thead>
+              <tr><th>Time</th><th>League</th><th>Fixture</th><th>Tip</th></tr>
+            </thead>
+            <tbody>
+              {freeTips.map((tip) => (
+                <tr key={tip.id}>
+                  <td>{tip.kickoffTime}</td>
+                  <td>{tip.league}</td>
+                  <td>{tip.fixture}</td>
+                  <td>{tip.prediction}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-          <Link
-            to="/free-tips"
-            style={{
-              display: 'inline-block',
-              padding: '10px 28px',
-              background: 'transparent',
-              border: '1.5px solid #22c55e',
-              color: '#22c55e',
-              borderRadius: '8px',
-              fontWeight: '600',
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-              transition: 'all 0.2s',
-            }}
-          >
+          <Link to="/free-tips" style={{ display: 'inline-block', padding: '10px 28px', background: 'transparent', border: '1.5px solid #22c55e', color: '#22c55e', borderRadius: '8px', fontWeight: '600', textDecoration: 'none', fontSize: '0.9rem' }}>
             See All Free Tips →
           </Link>
         </div>
@@ -132,48 +126,47 @@ const Home = () => {
           </Link>
         </div>
 
-        <div className="plans">
-          <PremiumTipCard
-            league="EPL"
-            fixture="Arsenal vs Chelsea"
-            tip="Over 2.5"
-            odds="1.85"
-            level="GOLD"
-            userPlan={userPlan}
-          />
-          <PremiumTipCard
-            league="Serie A"
-            fixture="Inter vs Milan"
-            tip="BTTS"
-            odds="1.72"
-            level="SILVER"
-            userPlan={userPlan}
-          />
-          <PremiumTipCard
-            league="UCL"
-            fixture="PSG vs Bayern"
-            tip="Home Win"
-            odds="2.10"
-            level="PLATINUM"
-            userPlan={userPlan}
-          />
-        </div>
+        {premiumTips.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#64748b', padding: '20px' }}>
+            No premium tips posted yet today.
+          </p>
+        ) : (
+          <div className="plans">
+            {premiumTips.map((tip) => (
+              <div key={tip.id} style={{ background: '#0f172a', border: `1px solid ${LEVEL_COLOR[tip.level] || '#1e293b'}`, borderRadius: '12px', padding: '20px', position: 'relative', overflow: 'hidden' }}>
+                <span style={{ display: 'inline-block', background: '#22c55e', color: '#022c22', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', marginBottom: '10px', fontWeight: '700' }}>
+                  {tip.level}
+                </span>
+                {userPlan === "NONE" || (tip.level === "GOLD" && userPlan === "SILVER") || (tip.level === "PLATINUM" && userPlan !== "PLATINUM") ? (
+                  <div style={{ filter: 'blur(4px)', pointerEvents: 'none' }}>
+                    <p style={{ color: '#e5e7eb', fontWeight: '600' }}>{tip.league}</p>
+                    <p style={{ color: '#e5e7eb' }}>{tip.fixture}</p>
+                    <p style={{ color: '#10b981' }}>Tip: {tip.prediction}</p>
+                    <p style={{ color: '#f59e0b' }}>Odds: {tip.odds}</p>
+                  </div>
+                ) : (
+                  <>
+                    <p style={{ color: '#e5e7eb', fontWeight: '600' }}>{tip.league}</p>
+                    <p style={{ color: '#e5e7eb' }}>{tip.fixture}</p>
+                    <p style={{ color: '#10b981' }}>Tip: {tip.prediction}</p>
+                    <p style={{ color: '#f59e0b' }}>Odds: {tip.odds}</p>
+                  </>
+                )}
+                {(userPlan === "NONE") && (
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.7)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <p style={{ color: 'white' }}>🔒 Premium Tip</p>
+                    <button onClick={() => navigate('/subscribe')} style={{ background: '#22c55e', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>
+                      Subscribe to Unlock
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <Link
-            to="/premium-tips"
-            style={{
-              display: 'inline-block',
-              padding: '10px 28px',
-              background: 'transparent',
-              border: '1.5px solid #22c55e',
-              color: '#22c55e',
-              borderRadius: '8px',
-              fontWeight: '600',
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-            }}
-          >
+          <Link to="/premium-tips" style={{ display: 'inline-block', padding: '10px 28px', background: 'transparent', border: '1.5px solid #22c55e', color: '#22c55e', borderRadius: '8px', fontWeight: '600', textDecoration: 'none', fontSize: '0.9rem' }}>
             View All Premium Tips →
           </Link>
         </div>
@@ -181,83 +174,27 @@ const Home = () => {
 
       {/* PREMIUM PLANS */}
       <section className="section dark" id="premium-plans">
-        <h2 className="section-title" style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>
-          Premium Plans
-        </h2>
-
+        <h2 className="section-title" style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Premium Plans</h2>
         <div className="plans" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '800px', margin: '0 auto' }}>
-          {/* Silver Plan */}
-          <div style={{ backgroundColor: '#1a2332', borderRadius: '12px', padding: '2rem', position: 'relative' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-              <span style={{ backgroundColor: '#d1fae5', color: '#065f46', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: '600' }}>
-                Silver Plan
-              </span>
-              <div style={{ color: '#fbbf24', fontSize: '1.25rem' }}>⭐⭐⭐⭐⭐</div>
+          {[
+            { label: 'Silver Plan', bg: '#d1fae5', color: '#065f46', stars: '⭐⭐⭐⭐⭐', desc: 'Get sure 3-5 odds daily and earn consistently. Tips are sent instantly via SMS.', price: 'KSH. 50' },
+            { label: 'Gold Plan',   bg: '#fef3c7', color: '#92400e', stars: '⭐⭐⭐⭐✨', desc: 'Get sure 5-7 odds daily and earn consistently. Tips are sent instantly via SMS.', price: 'KSH. 70' },
+            { label: 'Platinum Plan', bg: '#e0e7ff', color: '#3730a3', stars: '⭐⭐⭐⭐☆', desc: 'Get sure 8-15 odds daily and earn consistently. Tips are sent instantly via SMS.', price: 'KSH. 100' },
+          ].map((plan) => (
+            <div key={plan.label} style={{ backgroundColor: '#1a2332', borderRadius: '12px', padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <span style={{ backgroundColor: plan.bg, color: plan.color, padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: '600' }}>{plan.label}</span>
+                <div style={{ color: '#fbbf24', fontSize: '1.25rem' }}>{plan.stars}</div>
+              </div>
+              <p style={{ color: '#e5e7eb', marginBottom: '1.5rem', lineHeight: '1.6' }}>{plan.desc}</p>
+              <button onClick={() => navigate("/subscribe")} style={{ backgroundColor: '#10b981', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
+                BUY @{plan.price}
+              </button>
             </div>
-            <p style={{ color: '#e5e7eb', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-              Get sure 3-5 odds daily and earn consistently. Tips are sent instantly via SMS.
-            </p>
-            <button
-              onClick={() => navigate("/subscribe")}
-              style={{ backgroundColor: '#10b981', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}
-            >
-              BUY @KSH. 50
-            </button>
-          </div>
-
-          {/* Gold Plan */}
-          <div style={{ backgroundColor: '#1a2332', borderRadius: '12px', padding: '2rem', position: 'relative' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-              <span style={{ backgroundColor: '#fef3c7', color: '#92400e', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: '600' }}>
-                Gold Plan
-              </span>
-              <div style={{ color: '#fbbf24', fontSize: '1.25rem' }}>⭐⭐⭐⭐✨</div>
-            </div>
-            <p style={{ color: '#e5e7eb', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-              Get sure 5-7 odds daily and earn consistently. Tips are sent instantly via SMS.
-            </p>
-            <button
-              onClick={() => navigate("/subscribe")}
-              style={{ backgroundColor: '#10b981', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}
-            >
-              BUY @KSH. 70
-            </button>
-          </div>
-
-          {/* Platinum Plan */}
-          <div style={{ backgroundColor: '#1a2332', borderRadius: '12px', padding: '2rem', position: 'relative' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-              <span style={{ backgroundColor: '#e0e7ff', color: '#3730a3', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: '600' }}>
-                Platinum Plan
-              </span>
-              <div style={{ color: '#fbbf24', fontSize: '1.25rem' }}>⭐⭐⭐⭐☆</div>
-            </div>
-            <p style={{ color: '#e5e7eb', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-              Get sure 8-15 odds daily and earn consistently. Tips are sent instantly via SMS.
-            </p>
-            <button
-              onClick={() => navigate("/subscribe")}
-              style={{ backgroundColor: '#10b981', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}
-            >
-              BUY @KSH. 100
-            </button>
-          </div>
+          ))}
         </div>
-
         <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-          <Link
-            to="/subscribe"
-            style={{
-              display: 'inline-block',
-              padding: '12px 36px',
-              background: '#10b981',
-              color: 'white',
-              borderRadius: '8px',
-              fontWeight: '700',
-              textDecoration: 'none',
-              fontSize: '1rem',
-            }}
-          >
+          <Link to="/subscribe" style={{ display: 'inline-block', padding: '12px 36px', background: '#10b981', color: 'white', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '1rem' }}>
             See All Plans & Durations →
           </Link>
         </div>
@@ -280,50 +217,22 @@ const Home = () => {
           <h2 style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem' }}>
             Recently Won Premium Tips
           </h2>
-
           <div className="filters" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
             {(['yesterday', 'today', 'week'] as const).map((f) => (
-              <button
-                key={f}
-                className={wonTipsFilter === f ? "active" : ""}
-                onClick={() => setWonTipsFilter(f)}
-                style={{
-                  padding: '0.5rem 1.5rem',
-                  borderRadius: '8px',
-                  border: wonTipsFilter === f ? '2px solid #10b981' : '2px solid #e5e7eb',
-                  backgroundColor: wonTipsFilter === f ? '#10b981' : 'white',
-                  color: wonTipsFilter === f ? 'white' : '#6b7280',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '0.875rem',
-                  transition: 'all 0.2s',
-                }}
-              >
+              <button key={f} className={wonTipsFilter === f ? "active" : ""} onClick={() => setWonTipsFilter(f)}
+                style={{ padding: '0.5rem 1.5rem', borderRadius: '8px', border: wonTipsFilter === f ? '2px solid #10b981' : '2px solid #e5e7eb', backgroundColor: wonTipsFilter === f ? '#10b981' : 'white', color: wonTipsFilter === f ? 'white' : '#6b7280', cursor: 'pointer', fontWeight: '600', fontSize: '0.875rem' }}>
                 {f === 'week' ? 'This Week' : f.charAt(0).toUpperCase() + f.slice(1)}
               </button>
             ))}
           </div>
 
-          {/* Accordions */}
           {[
-            {
-              key: 'silver', label: 'Silver Plan',
-              rows: [{ league: 'EPL', match: 'Arsenal vs Liverpool', tip: 'Over 2.5' }],
-            },
-            {
-              key: 'gold', label: 'Gold Plan',
-              rows: [{ league: 'La Liga', match: 'Barcelona vs Madrid', tip: 'BTTS' }],
-            },
-            {
-              key: 'platinum', label: 'Platinum Plan',
-              rows: [{ league: 'UCL', match: 'Bayern vs PSG', tip: 'Home Win' }],
-            },
+            { key: 'silver', label: 'Silver Plan', rows: [{ league: 'EPL', match: 'Arsenal vs Liverpool', tip: 'Over 2.5' }] },
+            { key: 'gold',   label: 'Gold Plan',   rows: [{ league: 'La Liga', match: 'Barcelona vs Madrid', tip: 'BTTS' }] },
+            { key: 'platinum', label: 'Platinum Plan', rows: [{ league: 'UCL', match: 'Bayern vs PSG', tip: 'Home Win' }] },
           ].map(({ key, label, rows }) => (
             <div key={key} style={{ marginBottom: '1rem' }}>
-              <button
-                onClick={() => togglePlan(key)}
-                style={{ width: '100%', backgroundColor: '#f9fafb', padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1.125rem', fontWeight: '600' }}
-              >
+              <button onClick={() => togglePlan(key)} style={{ width: '100%', backgroundColor: '#f9fafb', padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1.125rem', fontWeight: '600' }}>
                 <span>{label}</span>
                 <span style={{ fontSize: '1.5rem' }}>{openPlan === key ? '▼' : '▶'}</span>
               </button>
@@ -362,10 +271,7 @@ const Home = () => {
           ))}
 
           <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-            <Link
-              to="/premium-tips"
-              style={{ display: 'inline-block', padding: '10px 28px', background: '#10b981', color: 'white', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '0.9rem' }}
-            >
+            <Link to="/premium-tips" style={{ display: 'inline-block', padding: '10px 28px', background: '#10b981', color: 'white', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '0.9rem' }}>
               View Today's Premium Tips →
             </Link>
           </div>
@@ -375,24 +281,19 @@ const Home = () => {
       {/* WHY CHOOSE US */}
       <section className="section" style={{ backgroundColor: '#ffffff', padding: '3rem 1rem' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
-          <div style={{ marginBottom: '2rem' }}>
-            <p style={{ color: '#10b981', fontSize: '0.875rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
-              WHY CHOOSE US
-            </p>
-            <h2 style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', lineHeight: '1.3' }}>
-              Best Football Predictions & Betting Tips in Kenya | Expert Analysis Daily
-            </h2>
-            <p style={{ color: '#4b5563', fontSize: '1rem', lineHeight: '1.7', marginBottom: '2.5rem' }}>
-              Get accurate football betting predictions from Kenya's leading tipsters. We deliver data-driven analysis, sure odds, and winning strategies for Premier League, Champions League, Kenyan Premier League, and 40+ international leagues. Join thousands of successful bettors who trust our 90%+ accuracy rate for daily betting tips, jackpot predictions, and expert picks.
-            </p>
-          </div>
-
+          <p style={{ color: '#10b981', fontSize: '0.875rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>WHY CHOOSE US</p>
+          <h2 style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', lineHeight: '1.3' }}>
+            Best Football Predictions & Betting Tips in Kenya
+          </h2>
+          <p style={{ color: '#4b5563', fontSize: '1rem', lineHeight: '1.7', marginBottom: '2.5rem' }}>
+            Get accurate football betting predictions from Kenya's leading tipsters. We deliver data-driven analysis, sure odds, and winning strategies for Premier League, Champions League, Kenyan Premier League, and 40+ international leagues.
+          </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
             {[
-              { bg: '#d1fae5', iconColor: '#10b981', icon: '✓', title: 'Premium Football Tips', desc: <>Get daily <b style={{color:'#10b981'}}>3+ odds</b>, <b style={{color:'#10b981'}}>5+ odds</b>, and <b style={{color:'#10b981'}}>15+ odds</b> betting tips with guaranteed odds ranging from 3-15x returns.</> },
-              { bg: '#dbeafe', iconColor: '#3b82f6', icon: '$', title: 'Jackpot Predictions', desc: <>Expert <b style={{color:'#10b981'}}>SportPesa Mega Jackpot</b> and <b style={{color:'#10b981'}}>Betika Midweek Jackpot</b> predictions to maximize your chances of winning millions.</> },
-              { bg: '#fef3c7', iconColor: '#f59e0b', icon: '📊', title: 'Betting Strategies & Education', desc: <>Learn winning strategies, bankroll management, and market analysis through our comprehensive <b style={{color:'#10b981'}}>betting blog</b>.</> },
-              { bg: '#e0e7ff', iconColor: '#6366f1', icon: '⏱', title: 'Instant SMS Delivery', desc: 'Get your purchased tips delivered instantly via SMS. Never miss a winning opportunity with our fast and reliable delivery system.' },
+              { bg: '#d1fae5', iconColor: '#10b981', icon: '✓', title: 'Premium Football Tips', desc: 'Get daily 3+ odds, 5+ odds, and 15+ odds betting tips with guaranteed odds ranging from 3-15x returns.' },
+              { bg: '#dbeafe', iconColor: '#3b82f6', icon: '$', title: 'Jackpot Predictions', desc: 'Expert SportPesa Mega Jackpot and Betika Midweek Jackpot predictions to maximize your chances.' },
+              { bg: '#fef3c7', iconColor: '#f59e0b', icon: '📊', title: 'Betting Strategies', desc: 'Learn winning strategies, bankroll management, and market analysis through our resources.' },
+              { bg: '#e0e7ff', iconColor: '#6366f1', icon: '⏱', title: 'Instant SMS Delivery', desc: 'Get your purchased tips delivered instantly via SMS. Never miss a winning opportunity.' },
             ].map((f, i) => (
               <div key={i}>
                 <div style={{ width: '48px', height: '48px', backgroundColor: f.bg, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
@@ -403,12 +304,8 @@ const Home = () => {
               </div>
             ))}
           </div>
-
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <Link
-              to="/register"
-              style={{ display: 'inline-block', padding: '14px 40px', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', borderRadius: '10px', fontWeight: '700', textDecoration: 'none', fontSize: '1rem' }}
-            >
+            <Link to={user ? "/subscribe" : "/register"} style={{ display: 'inline-block', padding: '14px 40px', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', borderRadius: '10px', fontWeight: '700', textDecoration: 'none', fontSize: '1rem' }}>
               Get Started — It's Free →
             </Link>
           </div>
