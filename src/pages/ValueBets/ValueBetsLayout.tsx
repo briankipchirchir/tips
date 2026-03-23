@@ -1,12 +1,14 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { valueBetsApi } from "../../services/api";
 import "./ValueBets.css";
 
 export interface Prediction {
-  id: number;
-  matchNum: number;
+  id: string;
+  matchNumber: number;
   league: string;
-  date: string;
+  gameDate: string;
   fixture: string;
   pick: string;
   odds: string;
@@ -18,46 +20,50 @@ interface Props {
   title: string;
   eyebrow: string;
   description: string;
+  category: string;
   jackpotInfo?: { label: string; value: string; highlight?: boolean }[];
-  predictions: Prediction[];
 }
 
 const TABS = [
-  { label: "SportPesa Jackpot", path: "/value-bets/sportpesa" },
-  { label: "Betika Jackpot",    path: "/value-bets/betika" },
-  { label: "Correct Score",     path: "/value-bets/correct-score" },
-  { label: "Goal Range",        path: "/value-bets/goal-range" },
+  { label: "SportPesa Jackpot", path: "/value-bets/sportpesa",     category: "SPORTPESA"     },
+  { label: "Betika Jackpot",    path: "/value-bets/betika",        category: "BETIKA"        },
+  { label: "Correct Score",     path: "/value-bets/correct-score", category: "CORRECT_SCORE" },
+  { label: "Goal Range",        path: "/value-bets/goal-range",    category: "GOAL_RANGE"    },
 ];
 
-const ValueBetsLayout = ({ title, eyebrow, description, jackpotInfo, predictions }: Props) => {
+const ValueBetsLayout = ({ title, eyebrow, description, category, jackpotInfo }: Props) => {
   const { userPlan } = useAuth();
   const location = useLocation();
   const isSubscribed = userPlan && userPlan !== "NONE";
+  const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    valueBetsApi.getByCategory(category.toLowerCase().replace("_", "-"))
+      .then((res) => setPredictions(res.data))
+      .catch(() => setPredictions([]))
+      .finally(() => setLoading(false));
+  }, [category]);
 
   return (
     <div className="vb-page">
       <div className="vb-inner">
-        {/* Header */}
         <div className="vb-header">
           <p className="vb-eyebrow">{eyebrow}</p>
           <h1>{title}</h1>
           <p>{description}</p>
         </div>
 
-        {/* Tab Nav */}
         <div className="vb-tabs">
           {TABS.map((tab) => (
-            <Link
-              key={tab.path}
-              to={tab.path}
-              className={`vb-tab ${location.pathname === tab.path ? "active" : ""}`}
-            >
+            <Link key={tab.path} to={tab.path}
+              className={`vb-tab ${location.pathname === tab.path ? "active" : ""}`}>
               {tab.label}
             </Link>
           ))}
         </div>
 
-        {/* Lock Banner */}
         {!isSubscribed && (
           <div className="vb-lock-banner">
             <div>
@@ -68,7 +74,6 @@ const ValueBetsLayout = ({ title, eyebrow, description, jackpotInfo, predictions
           </div>
         )}
 
-        {/* Jackpot Info Bar */}
         {jackpotInfo && jackpotInfo.length > 0 && (
           <div className="vb-info-bar">
             {jackpotInfo.map((item, i) => (
@@ -80,8 +85,12 @@ const ValueBetsLayout = ({ title, eyebrow, description, jackpotInfo, predictions
           </div>
         )}
 
-        {/* Predictions */}
-        {predictions.length === 0 ? (
+        {loading ? (
+          <div className="vb-empty">
+            <div className="vb-empty-icon">⏳</div>
+            <h3>Loading predictions...</h3>
+          </div>
+        ) : predictions.length === 0 ? (
           <div className="vb-empty">
             <div className="vb-empty-icon">📋</div>
             <h3>No predictions yet</h3>
@@ -95,21 +104,18 @@ const ValueBetsLayout = ({ title, eyebrow, description, jackpotInfo, predictions
                 <div className="vb-card" key={p.id}>
                   <div className="vb-card-main">
                     <div className="vb-match-info">
-                      <div className="vb-match-num">Match {p.matchNum}</div>
-                      <div className="vb-league-date">{p.league} · {p.date}</div>
+                      <div className="vb-match-num">Match {p.matchNumber}</div>
+                      <div className="vb-league-date">{p.league} · {p.gameDate}</div>
                       <div className="vb-fixture">{p.fixture}</div>
                     </div>
-
                     <div className="vb-pick-box">
                       <div className="vb-pick-label">Pick</div>
                       <div className="vb-pick-value">{p.pick}</div>
                     </div>
-
                     <div className="vb-odds-box">
                       <div className="vb-odds-label">Odds</div>
-                      <div className="vb-odds-value">{p.odds}</div>
+                      <div className="vb-odds-value">{p.odds || "N/A"}</div>
                     </div>
-
                     <div className="vb-conf-box">
                       <div className="vb-conf-label">Confidence</div>
                       <div className="vb-conf-bar">
@@ -118,12 +124,10 @@ const ValueBetsLayout = ({ title, eyebrow, description, jackpotInfo, predictions
                       <div className="vb-conf-pct">{p.confidence}%</div>
                     </div>
                   </div>
-
                   <div className="vb-card-analysis">
                     <span className="vb-analysis-icon">📊</span>
                     <span className="vb-analysis-text">{p.analysis}</span>
                   </div>
-
                   {isLocked && (
                     <div className="vb-card-lock-overlay">
                       <span>🔒</span>
