@@ -59,6 +59,8 @@ export const tipsApi = {
     api.get("/api/tips/free", { params: date ? { date } : {} }),
   getPremiumTips: (date?: string) =>
     api.get("/api/tips/premium", { params: date ? { date } : {} }),
+   getWonTips: (filter: string) =>
+    api.get("/api/tips/won", { params: { filter } }),
 };
 
 // ── Value Bets ──

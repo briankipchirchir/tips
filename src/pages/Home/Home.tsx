@@ -56,6 +56,23 @@ const Home = () => {
     FREE: "#10b981", SILVER: "#94a3b8", GOLD: "#f59e0b", PLATINUM: "#818cf8",
   };
 
+  const [wonTips, setWonTips] = useState<Record<string, Tip[]>>({ silver: [], gold: [], platinum: [] });
+const [wonTipsLoading, setWonTipsLoading] = useState(false);
+
+useEffect(() => {
+  setWonTipsLoading(true);
+  tipsApi.getWonTips(wonTipsFilter)
+    .then((res) => {
+      const grouped: Record<string, Tip[]> = { silver: [], gold: [], platinum: [] };
+      res.data.forEach((tip: Tip) => {
+        const key = tip.level.toLowerCase();
+        if (grouped[key]) grouped[key].push(tip);
+      });
+      setWonTips(grouped);
+    })
+    .catch(() => setWonTips({ silver: [], gold: [], platinum: [] }))
+    .finally(() => setWonTipsLoading(false));
+}, [wonTipsFilter]);
   return (
     <main className="home">
       {/* HERO */}
@@ -211,72 +228,82 @@ const Home = () => {
         </div>
       </section>
 
-      {/* RECENTLY WON PREMIUM TIPS */}
-      <section className="section" style={{ backgroundColor: '#f3f4f6', padding: '3rem 1rem' }}>
-        <div style={{ backgroundColor: 'white', maxWidth: '900px', margin: '0 auto', borderRadius: '12px', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <h2 style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem' }}>
-            Recently Won Premium Tips
-          </h2>
-          <div className="filters" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
-            {(['yesterday', 'today', 'week'] as const).map((f) => (
-              <button key={f} className={wonTipsFilter === f ? "active" : ""} onClick={() => setWonTipsFilter(f)}
-                style={{ padding: '0.5rem 1.5rem', borderRadius: '8px', border: wonTipsFilter === f ? '2px solid #10b981' : '2px solid #e5e7eb', backgroundColor: wonTipsFilter === f ? '#10b981' : 'white', color: wonTipsFilter === f ? 'white' : '#6b7280', cursor: 'pointer', fontWeight: '600', fontSize: '0.875rem' }}>
-                {f === 'week' ? 'This Week' : f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
-          </div>
+    {/* RECENTLY WON PREMIUM TIPS */}
+<section className="section" style={{ backgroundColor: '#f3f4f6', padding: '3rem 1rem' }}>
+  <div style={{ backgroundColor: 'white', maxWidth: '900px', margin: '0 auto', borderRadius: '12px', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+    <h2 style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem' }}>
+      Recently Won Premium Tips
+    </h2>
+    <div className="filters" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
+      {(['yesterday', 'today', 'week'] as const).map((f) => (
+        <button key={f} className={wonTipsFilter === f ? "active" : ""} onClick={() => setWonTipsFilter(f)}
+          style={{ padding: '0.5rem 1.5rem', borderRadius: '8px', border: wonTipsFilter === f ? '2px solid #10b981' : '2px solid #e5e7eb', backgroundColor: wonTipsFilter === f ? '#10b981' : 'white', color: wonTipsFilter === f ? 'white' : '#6b7280', cursor: 'pointer', fontWeight: '600', fontSize: '0.875rem' }}>
+          {f === 'week' ? 'This Week' : f.charAt(0).toUpperCase() + f.slice(1)}
+        </button>
+      ))}
+    </div>
 
-          {[
-            { key: 'silver', label: 'Silver Plan', rows: [{ league: 'EPL', match: 'Arsenal vs Liverpool', tip: 'Over 2.5' }] },
-            { key: 'gold',   label: 'Gold Plan',   rows: [{ league: 'La Liga', match: 'Barcelona vs Madrid', tip: 'BTTS' }] },
-            { key: 'platinum', label: 'Platinum Plan', rows: [{ league: 'UCL', match: 'Bayern vs PSG', tip: 'Home Win' }] },
-          ].map(({ key, label, rows }) => (
-            <div key={key} style={{ marginBottom: '1rem' }}>
-              <button onClick={() => togglePlan(key)} style={{ width: '100%', backgroundColor: '#f9fafb', padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1.125rem', fontWeight: '600' }}>
-                <span>{label}</span>
-                <span style={{ fontSize: '1.5rem' }}>{openPlan === key ? '▼' : '▶'}</span>
-              </button>
-              {openPlan === key && (
-                <div style={{ padding: '1.5rem', backgroundColor: '#f9fafb', marginTop: '0.5rem', borderRadius: '8px' }}>
-                  <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
-                    {wonTipsFilter === 'yesterday' && `Yesterday's winning ${label} tips`}
-                    {wonTipsFilter === 'today' && `Today's winning ${label} tips`}
-                    {wonTipsFilter === 'week' && `This week's winning ${label} tips`}
-                  </p>
-                  <table style={{ width: '100%', fontSize: '0.875rem' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
-                        <th style={{ padding: '0.5rem', textAlign: 'left' }}>League</th>
-                        <th style={{ padding: '0.5rem', textAlign: 'left' }}>Match</th>
-                        <th style={{ padding: '0.5rem', textAlign: 'left' }}>Tip</th>
-                        <th style={{ padding: '0.5rem', textAlign: 'center' }}>Status</th>
+    {wonTipsLoading ? (
+      <p style={{ textAlign: 'center', color: '#6b7280', padding: '1rem' }}>Loading...</p>
+    ) : (
+      [
+        { key: 'silver', label: 'Silver Plan' },
+        { key: 'gold', label: 'Gold Plan' },
+        { key: 'platinum', label: 'Platinum Plan' },
+      ].map(({ key, label }) => (
+        <div key={key} style={{ marginBottom: '1rem' }}>
+          <button onClick={() => togglePlan(key)} style={{ width: '100%', backgroundColor: '#f9fafb', padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1.125rem', fontWeight: '600' }}>
+            <span>{label}</span>
+            <span style={{ fontSize: '1.5rem' }}>{openPlan === key ? '▼' : '▶'}</span>
+          </button>
+          {openPlan === key && (
+            <div style={{ padding: '1.5rem', backgroundColor: '#f9fafb', marginTop: '0.5rem', borderRadius: '8px' }}>
+              <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
+                {wonTipsFilter === 'yesterday' && `Yesterday's winning ${label} tips`}
+                {wonTipsFilter === 'today' && `Today's winning ${label} tips`}
+                {wonTipsFilter === 'week' && `This week's winning ${label} tips`}
+              </p>
+              {wonTips[key].length === 0 ? (
+                <p style={{ color: '#6b7280', textAlign: 'center', padding: '1rem' }}>
+                  No won tips for this period.
+                </p>
+              ) : (
+                <table style={{ width: '100%', fontSize: '0.875rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
+                      <th style={{ padding: '0.5rem', textAlign: 'left' }}>League</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'left' }}>Match</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'left' }}>Tip</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'center' }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {wonTips[key].map((tip) => (
+                      <tr key={tip.id}>
+                        <td style={{ padding: '0.5rem' }}>{tip.league}</td>
+                        <td style={{ padding: '0.5rem' }}>{tip.fixture}</td>
+                        <td style={{ padding: '0.5rem' }}>{tip.prediction}</td>
+                        <td style={{ padding: '0.5rem', textAlign: 'center' }}>
+                          <span style={{ color: '#10b981', fontWeight: '600' }}>✓ Won</span>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((row, i) => (
-                        <tr key={i}>
-                          <td style={{ padding: '0.5rem' }}>{row.league}</td>
-                          <td style={{ padding: '0.5rem' }}>{row.match}</td>
-                          <td style={{ padding: '0.5rem' }}>{row.tip}</td>
-                          <td style={{ padding: '0.5rem', textAlign: 'center' }}>
-                            <span style={{ color: '#10b981', fontWeight: '600' }}>✓ Won</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               )}
             </div>
-          ))}
-
-          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-            <Link to="/premium-tips" style={{ display: 'inline-block', padding: '10px 28px', background: '#10b981', color: 'white', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '0.9rem' }}>
-              View Today's Premium Tips →
-            </Link>
-          </div>
+          )}
         </div>
-      </section>
+      ))
+    )}
+
+    <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+      <Link to="/premium-tips" style={{ display: 'inline-block', padding: '10px 28px', background: '#10b981', color: 'white', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '0.9rem' }}>
+        View Today's Premium Tips →
+      </Link>
+    </div>
+  </div>
+</section>
 
       {/* WHY CHOOSE US */}
       <section className="section" style={{ backgroundColor: '#ffffff', padding: '3rem 1rem' }}>
