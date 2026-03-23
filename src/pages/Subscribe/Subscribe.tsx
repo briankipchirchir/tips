@@ -52,46 +52,51 @@ const Subscribe = () => {
   const payPlan: PlanLevel = activeTab === "valuebets" ? "VALUE_BETS" : selectedPlan;
   const payDuration = activeTab === "valuebets" ? "ONE_DAY" : DURATION_MAP[selectedDuration];
 
-  const handlePay = async () => {
-    if (mpesaNumber.length < 9) { setError("Enter a valid M-Pesa number."); return; }
-    if (!sameNumber && smsNumber.length < 9) { setError("Enter a valid SMS number."); return; }
-    setError("");
-    setLoading(true);
-    try {
-      await paymentsApi.initiateStk({
-        mpesaPhone: mpesaNumber,
-        smsPhone: effectiveSmsNumber,
-        planLevel: payPlan,
-        duration: payDuration,
-      });
-      await refreshProfile();
-      setStep("success");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Payment failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+ const handlePay = async () => {
+  if (mpesaNumber.length < 9) { setError("Enter a valid M-Pesa number."); return; }
+  if (!sameNumber && smsNumber.length < 9) { setError("Enter a valid SMS number."); return; }
+  setError("");
+  setLoading(true);
+  try {
+    await paymentsApi.initiateStk({
+      mpesaPhone: mpesaNumber,
+      smsPhone: effectiveSmsNumber,
+      planLevel: payPlan,
+      duration: payDuration,
+    });
+    setStep("success"); // just show success — STK was queued
+  } catch (err: any) {
+    setError(err.response?.data?.message || "Payment failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (step === "success") {
-    return (
-      <div className="subscribe-page">
-        <div className="success-card">
-          <div className="success-icon">✓</div>
-          <h2>STK Push Sent!</h2>
-          <p>
-            Check your phone <strong>{mpesaNumber}</strong> for the M-Pesa prompt.
-            Enter your PIN to complete payment. Tips will be sent to{" "}
-            <strong>{effectiveSmsNumber}</strong> via SMS.
-          </p>
-          <button className="sub-btn" onClick={() => navigate(activeTab === "valuebets" ? "/value-bets/sportpesa" : "/premium-tips")}>
-            {activeTab === "valuebets" ? "View Value Bets →" : "View Premium Tips →"}
-          </button>
-          <button className="sub-btn-outline" onClick={() => navigate("/")}>Back to Home</button>
-        </div>
+  return (
+    <div className="subscribe-page">
+      <div className="success-card">
+        <div className="success-icon">✓</div>
+        <h2>STK Push Sent!</h2>
+        <p>
+          Check your phone <strong>{mpesaNumber}</strong> for the M-Pesa prompt.
+          Enter your PIN to complete payment. Tips will be sent to{" "}
+          <strong>{effectiveSmsNumber}</strong> via SMS.
+        </p>
+        <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+          Once you complete payment, your plan will activate automatically.
+        </p>
+        <button className="sub-btn" onClick={async () => {
+          await refreshProfile(); // refresh AFTER user confirms they've paid
+          navigate(activeTab === "valuebets" ? "/value-bets/sportpesa" : "/premium-tips");
+        }}>
+          {activeTab === "valuebets" ? "I've Paid — View Value Bets →" : "I've Paid — View Premium Tips →"}
+        </button>
+        <button className="sub-btn-outline" onClick={() => navigate("/")}>Back to Home</button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="subscribe-page">
