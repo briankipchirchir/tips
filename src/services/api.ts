@@ -100,6 +100,10 @@ export const adminApi = {
   deleteValueBet: (id: string) => api.delete(`/api/admin/value-bets/${id}`),
   getUsers: () => api.get("/api/admin/users"),
   getPayments: () => api.get("/api/admin/payments"),
+  updateTipStatus: (id: string, status: string) =>
+  api.patch(`/api/tips/${id}/status`, null, { params: { status } }),
+updateValueBetStatus: (id: string, status: string) =>
+  api.patch(`/api/value-bets/${id}/status`, null, { params: { status } }),
 };
 
 export default api;

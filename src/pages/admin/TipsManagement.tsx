@@ -16,6 +16,7 @@ interface Tip {
   analysis: string;
   gameDate: string;
   sent: boolean;
+   status: "PENDING" | "WON" | "LOST";
 }
 
 const LEVEL_BADGE: Record<TipLevel, string> = {
@@ -87,6 +88,15 @@ const TipsManagement = () => {
     fetchTips();
   };
 
+  const handleStatusUpdate = async (id: string, status: string) => {
+  try {
+    await adminApi.updateTipStatus(id, status);
+    fetchTips();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
   return (
     <AdminLayout title="Tips Management">
       <div className="admin-section">
@@ -108,7 +118,7 @@ const TipsManagement = () => {
         <div style={{ overflowX: "auto" }}>
           <table className="admin-table">
             <thead>
-              <tr><th>Time</th><th>League</th><th>Fixture</th><th>Tip</th><th>Odds</th><th>Package</th><th>Sent</th><th>Actions</th></tr>
+              <tr><th>Time</th><th>League</th><th>Fixture</th><th>Tip</th><th>Odds</th><th>Package</th><th>Sent</th><th>Status</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {loading ? (
@@ -124,6 +134,25 @@ const TipsManagement = () => {
                   <td style={{ color: "#f59e0b", fontWeight: 700 }}>{tip.odds || "-"}</td>
                   <td><span className={`badge ${LEVEL_BADGE[tip.level]}`}>{tip.level}</span></td>
                   <td>{tip.sent ? <span className="badge badge-green">✓ Sent</span> : <span className="badge badge-red">Pending</span>}</td>
+                  <td>
+  <select
+    value={tip.status}
+    onChange={(e) => handleStatusUpdate(tip.id, e.target.value)}
+    style={{
+      background: tip.status === "WON" ? "#064e3b" : tip.status === "LOST" ? "#7f1d1d" : "#1e293b",
+      color: tip.status === "WON" ? "#10b981" : tip.status === "LOST" ? "#ef4444" : "#94a3b8",
+      border: "none",
+      borderRadius: "6px",
+      padding: "4px 8px",
+      fontWeight: 600,
+      cursor: "pointer"
+    }}
+  >
+    <option value="PENDING">⏳ Pending</option>
+    <option value="WON">✅ Won</option>
+    <option value="LOST">❌ Lost</option>
+  </select>
+</td>
                   <td>
                     <div style={{ display: "flex", gap: 6 }}>
                       <button className="btn-icon" onClick={() => openEdit(tip)}>✏️</button>
