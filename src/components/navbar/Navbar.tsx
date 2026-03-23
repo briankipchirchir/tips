@@ -7,7 +7,6 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const { user, userPlan } = useAuth();
 
-
   return (
     <nav className="navbar">
       <Link to="/" className="logo" onClick={() => setOpen(false)}>BetTips</Link>
@@ -35,11 +34,20 @@ const Navbar = () => {
 
         {user ? (
           <>
+            {user.role === 'ADMIN' && (
+              <li>
+                <Link to="/admin" className="nav-btn admin-btn" onClick={() => setOpen(false)}>
+                  ⚙️ Admin
+                </Link>
+              </li>
+            )}
+
             {userPlan && userPlan !== "NONE" && (
               <li>
                 <span className="plan-badge">{userPlan}</span>
               </li>
             )}
+
             <li>
               <Link to="/profile" className="nav-avatar" onClick={() => setOpen(false)}>
                 {user.fullName.charAt(0).toUpperCase()}
