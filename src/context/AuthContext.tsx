@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { authApi, userApi } from "../services/api";
 
-type PlanLevel = "FREE" | "SILVER" | "GOLD" | "PLATINUM" | "NONE";
+type PlanLevel = "FREE" | "SILVER" | "GOLD" | "PLATINUM" | "VALUE_BETS" | "NONE";
 type Duration = "1day" | "3days" | "1week" | "1month";
 
 interface UserData {

@@ -34,7 +34,7 @@ const TABS = [
 const ValueBetsLayout = ({ title, eyebrow, description, category, jackpotInfo }: Props) => {
   const { userPlan } = useAuth();
   const location = useLocation();
-  const isSubscribed = userPlan && userPlan !== "NONE";
+  const isSubscribed = userPlan && (userPlan === "VALUE_BETS" || userPlan === "SILVER" || userPlan === "GOLD" || userPlan === "PLATINUM");
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -70,7 +70,7 @@ const ValueBetsLayout = ({ title, eyebrow, description, category, jackpotInfo }:
               <h3>🔒 Subscription Required</h3>
               <p>Value Bets predictions are available to all active subscribers. Subscribe from KSH 50/day.</p>
             </div>
-            <Link to="/subscribe" className="vb-subscribe-btn">Subscribe Now</Link>
+            <Link to="/subscribe?tab=valuebets" className="vb-subscribe-btn">Subscribe Now — KSH 99</Link>
           </div>
         )}
 
@@ -131,7 +131,7 @@ const ValueBetsLayout = ({ title, eyebrow, description, category, jackpotInfo }:
                   {isLocked && (
                     <div className="vb-card-lock-overlay">
                       <span>🔒</span>
-                      <Link to="/subscribe">Subscribe to unlock</Link>
+                      <Link to="/subscribe?tab=valuebets">Subscribe — KSH 99</Link>
                     </div>
                   )}
                 </div>
