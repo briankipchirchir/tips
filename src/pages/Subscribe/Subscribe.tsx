@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {  useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { paymentsApi } from "../../services/api";
@@ -32,7 +32,7 @@ const DURATION_MAP: Record<Duration, string> = {
 };
 
 const Subscribe = () => {
-  const { userPlan, refreshProfile } = useAuth();
+  const { userPlan, refreshProfile,user, loading: authLoading  } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -52,7 +52,14 @@ const Subscribe = () => {
   const payPlan: PlanLevel = activeTab === "valuebets" ? "VALUE_BETS" : selectedPlan;
   const payDuration = activeTab === "valuebets" ? "ONE_DAY" : DURATION_MAP[selectedDuration];
 
+  
+
  const handlePay = async () => {
+  // Redirect to login if not authenticated
+  if (!authLoading && !user) {
+    navigate("/login?redirect=/subscribe");
+    return;
+  }
   if (mpesaNumber.length < 9) { setError("Enter a valid M-Pesa number."); return; }
   if (!sameNumber && smsNumber.length < 9) { setError("Enter a valid SMS number."); return; }
   setError("");
@@ -64,7 +71,7 @@ const Subscribe = () => {
       planLevel: payPlan,
       duration: payDuration,
     });
-    setStep("success"); // just show success — STK was queued
+    setStep("success");
   } catch (err: any) {
     setError(err.response?.data?.message || "Payment failed. Please try again.");
   } finally {
