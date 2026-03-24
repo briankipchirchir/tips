@@ -84,6 +84,8 @@ export const paymentsApi = {
     planLevel: string;
     duration: string;
   }) => api.post("/api/payments/mpesa/stk", data),
+   checkPaymentStatus: (reference: string) =>
+    api.get(`/api/payments/status/${reference}`),
 };
 
 // ── Admin ──

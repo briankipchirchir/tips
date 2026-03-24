@@ -41,7 +41,7 @@ const Subscribe = () => {
   const [mpesaNumber,      setMpesaNumber]      = useState("");
   const [smsNumber,        setSmsNumber]        = useState("");
   const [sameNumber,       setSameNumber]       = useState(true);
-  const [step,             setStep]             = useState<"select" | "success">("select");
+  const [step, setStep] = useState<"select" | "waiting" | "confirmed" | "failed">("select");
   const [loading,          setLoading]          = useState(false);
   const [error,            setError]            = useState("");
   const [activeTab,        setActiveTab]        = useState<"tips" | "valuebets">(searchParams.get("tab") === "valuebets" ? "valuebets" : "tips");
@@ -51,27 +51,56 @@ const Subscribe = () => {
   const effectiveSmsNumber = sameNumber ? mpesaNumber : smsNumber;
   const payPlan: PlanLevel = activeTab === "valuebets" ? "VALUE_BETS" : selectedPlan;
   const payDuration = activeTab === "valuebets" ? "ONE_DAY" : DURATION_MAP[selectedDuration];
+  const [paymentRef, setPaymentRef] = useState("");
+const [polling,    setPolling]    = useState(false);
+
 
   
+const startPolling = (ref: string) => {
+  setPolling(true);
+  let attempts = 0;
+  const maxAttempts = 24; // 2 minutes max
+
+  const interval = setInterval(async () => {
+    attempts++;
+    try {
+      const res = await paymentsApi.checkPaymentStatus(ref);
+      const status = res.data.status;
+
+      if (status === "SUCCESS") {
+        clearInterval(interval);
+        setPolling(false);
+        await refreshProfile();
+        setStep("confirmed");
+        startPolling(paymentRef);
+      } else if (status === "FAILED" || attempts >= maxAttempts) {
+        clearInterval(interval);
+        setPolling(false);
+        setStep(status === "FAILED" ? "failed" : "waiting");
+      }
+    } catch {
+      // keep polling silently
+    }
+  }, 5000);
+};
 
  const handlePay = async () => {
-  // Redirect to login if not authenticated
-  if (!authLoading && !user) {
-    navigate("/login?redirect=/subscribe");
-    return;
-  }
+  if (!authLoading && !user) { navigate("/login?redirect=/subscribe"); return; }
   if (mpesaNumber.length < 9) { setError("Enter a valid M-Pesa number."); return; }
   if (!sameNumber && smsNumber.length < 9) { setError("Enter a valid SMS number."); return; }
   setError("");
   setLoading(true);
   try {
-    await paymentsApi.initiateStk({
+    const res = await paymentsApi.initiateStk({
       mpesaPhone: mpesaNumber,
       smsPhone: effectiveSmsNumber,
       planLevel: payPlan,
       duration: payDuration,
     });
-    setStep("success");
+    const ref = res.data.checkoutRequestId;
+    setPaymentRef(ref);
+    setStep("waiting");
+    startPolling(ref);
   } catch (err: any) {
     setError(err.response?.data?.message || "Payment failed. Please try again.");
   } finally {
@@ -79,26 +108,58 @@ const Subscribe = () => {
   }
 };
 
-  if (step === "success") {
+ if (step === "waiting") {
   return (
     <div className="subscribe-page">
       <div className="success-card">
-        <div className="success-icon">✓</div>
-        <h2>STK Push Sent!</h2>
-        <p>
-          Check your phone <strong>{mpesaNumber}</strong> for the M-Pesa prompt.
-          Enter your PIN to complete payment. Tips will be sent to{" "}
-          <strong>{effectiveSmsNumber}</strong> via SMS.
+        <div className="success-icon">📱</div>
+        <h2>Check Your Phone!</h2>
+        <p>An M-Pesa prompt has been sent to <strong>{mpesaNumber}</strong>. Enter your PIN to complete payment.</p>
+        {polling && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8,
+                        justifyContent: "center", color: "#10b981", margin: "16px 0" }}>
+            <span className="spinner" />
+            <span style={{ color: "#94a3b8" }}>Waiting for confirmation...</span>
+          </div>
+        )}
+        <p style={{ color: "#6b7280", fontSize: "0.8rem", marginTop: 8 }}>
+          This page updates automatically once payment is confirmed.
         </p>
-        <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.5rem' }}>
-          Once you complete payment, your plan will activate automatically.
-        </p>
-        <button className="sub-btn" onClick={async () => {
-          await refreshProfile(); // refresh AFTER user confirms they've paid
-          navigate(activeTab === "valuebets" ? "/value-bets/sportpesa" : "/premium-tips");
-        }}>
-          {activeTab === "valuebets" ? "I've Paid — View Value Bets →" : "I've Paid — View Premium Tips →"}
+        <button className="sub-btn-outline" style={{ marginTop: 16 }}
+          onClick={() => { setPolling(false); setStep("select"); }}>
+          Cancel
         </button>
+      </div>
+    </div>
+  );
+}
+
+if (step === "confirmed") {
+  return (
+    <div className="subscribe-page">
+      <div className="success-card">
+        <div className="success-icon" style={{ background: "#064e3b", color: "#10b981", fontSize: "2rem" }}>🎉</div>
+        <h2 style={{ color: "#10b981" }}>Payment Confirmed!</h2>
+        <p>Your <strong>{payPlan}</strong> plan is now active. Tips will be sent to <strong>{effectiveSmsNumber}</strong> via SMS.</p>
+        <button className="sub-btn" onClick={() =>
+          navigate(activeTab === "valuebets" ? "/value-bets/sportpesa" : "/premium-tips")
+        }>
+          View Your Tips →
+        </button>
+        <button className="sub-btn-outline" onClick={() => navigate("/")}>Back to Home</button>
+      </div>
+    </div>
+  );
+}
+
+if (step === "failed") {
+  return (
+    <div className="subscribe-page">
+      <div className="success-card">
+        <div className="success-icon" style={{ background: "#7f1d1d", color: "#ef4444", fontSize: "2rem" }}>✕</div>
+        <h2 style={{ color: "#ef4444" }}>Payment Failed</h2>
+        <p>The payment was not completed. Please try again.</p>
+        <button className="sub-btn" onClick={() => setStep("select")}>Try Again</button>
         <button className="sub-btn-outline" onClick={() => navigate("/")}>Back to Home</button>
       </div>
     </div>
