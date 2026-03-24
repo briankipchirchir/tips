@@ -10,7 +10,7 @@ type Duration = "1day" | "3days" | "1week" | "1month";
 const PLANS = [
   { level: "SILVER" as PlanLevel, label: "Silver", tagline: "Great for casual bettors",
     odds: "3–5 odds daily", color: "#94a3b8",
-    prices: { "1day": 50, "3days": 120, "1week": 250, "1month": 800 } },
+    prices: { "1day": 1, "3days": 120, "1week": 250, "1month": 800 } },
   { level: "GOLD" as PlanLevel, label: "Gold", tagline: "Most popular — consistent wins",
     odds: "5–7 odds daily", color: "#f59e0b",
     prices: { "1day": 70, "3days": 180, "1week": 380, "1month": 1200 } },
