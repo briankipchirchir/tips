@@ -35,6 +35,7 @@ const Home = () => {
   // Fetch free tips when day changes
   useEffect(() => {
     setTipsLoading(true);
+
     tipsApi.getFreeTips(getDate(activeDay))
       .then((res) => setFreeTips(res.data))
       .catch(() => setFreeTips([]))
@@ -61,6 +62,7 @@ const [wonTipsLoading, setWonTipsLoading] = useState(false);
 
 useEffect(() => {
   setWonTipsLoading(true);
+   setOpenPlan("silver");
   tipsApi.getWonTips(wonTipsFilter)
     .then((res) => {
       const grouped: Record<string, Tip[]> = { silver: [], gold: [], platinum: [] };
