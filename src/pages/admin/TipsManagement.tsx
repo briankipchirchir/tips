@@ -16,7 +16,7 @@ interface Tip {
   analysis: string;
   gameDate: string;
   sent: boolean;
-   status: "PENDING" | "WON" | "LOST";
+  status: "PENDING" | "WON" | "LOST";
 }
 
 const LEVEL_BADGE: Record<TipLevel, string> = {
@@ -35,19 +35,19 @@ const TipsManagement = () => {
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [editId, setEditId] = useState<string | null>(null);
   const [filterLevel, setFilterLevel] = useState("ALL");
+  const [filterDate, setFilterDate] = useState(new Date().toISOString().slice(0, 10));
   const [saving, setSaving] = useState(false);
-
-  const today = new Date().toISOString().slice(0, 10);
 
   const fetchTips = () => {
     setLoading(true);
-    adminApi.getTips(today)
+    // Pass the selected date so the API returns tips for that day
+    adminApi.getTips(filterDate)
       .then((res) => setTips(res.data))
       .catch(() => setTips([]))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchTips(); }, []);
+  useEffect(() => { fetchTips(); }, [filterDate]);
 
   const filtered = filterLevel === "ALL" ? tips : tips.filter((t) => t.level === filterLevel);
 
@@ -55,11 +55,17 @@ const TipsManagement = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const openAdd = () => { setForm({ ...EMPTY_FORM }); setEditId(null); setShowModal(true); };
+  const openAdd = () => {
+    setForm({ ...EMPTY_FORM, gameDate: filterDate });
+    setEditId(null);
+    setShowModal(true);
+  };
   const openEdit = (tip: Tip) => {
-    setForm({ league: tip.league, fixture: tip.fixture, kickoffTime: tip.kickoffTime,
+    setForm({
+      league: tip.league, fixture: tip.fixture, kickoffTime: tip.kickoffTime,
       gameDate: tip.gameDate, prediction: tip.prediction, odds: tip.odds || "",
-      level: tip.level, analysis: tip.analysis || "" });
+      level: tip.level, analysis: tip.analysis || "",
+    });
     setEditId(tip.id);
     setShowModal(true);
   };
@@ -89,22 +95,48 @@ const TipsManagement = () => {
   };
 
   const handleStatusUpdate = async (id: string, status: string) => {
-  try {
-    await adminApi.updateTipStatus(id, status);
-    fetchTips();
-  } catch (e) {
-    console.error(e);
-  }
-};
+    try {
+      await adminApi.updateTipStatus(id, status);
+      fetchTips();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const isToday = filterDate === new Date().toISOString().slice(0, 10);
 
   return (
     <AdminLayout title="Tips Management">
       <div className="admin-section">
         <div className="admin-section-header">
-          <span className="admin-section-title">Today's Tips</span>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <select className="form-select" style={{ width: "auto", padding: "7px 12px" }}
-              value={filterLevel} onChange={(e) => setFilterLevel(e.target.value)}>
+          <span className="admin-section-title">
+            {isToday ? "Today's Tips" : `Tips for ${new Date(filterDate + "T00:00:00").toLocaleDateString("en-KE", { dateStyle: "long" })}`}
+          </span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            {/* ── Date picker ── */}
+            <input
+              className="form-input"
+              type="date"
+              style={{ width: "auto" }}
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              title="Pick a date"
+            />
+            {!isToday && (
+              <button
+                className="btn-secondary"
+                style={{ padding: "6px 10px", fontSize: "0.78rem" }}
+                onClick={() => setFilterDate(new Date().toISOString().slice(0, 10))}
+              >
+                Today
+              </button>
+            )}
+            <select
+              className="form-select"
+              style={{ width: "auto", padding: "7px 12px" }}
+              value={filterLevel}
+              onChange={(e) => setFilterLevel(e.target.value)}
+            >
               <option value="ALL">All Levels</option>
               <option value="FREE">Free</option>
               <option value="SILVER">Silver</option>
@@ -122,9 +154,9 @@ const TipsManagement = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} style={{ textAlign: "center", color: "#64748b" }}>Loading...</td></tr>
+                <tr><td colSpan={9} style={{ textAlign: "center", color: "#64748b" }}>Loading...</td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={8} style={{ textAlign: "center", color: "#64748b" }}>No tips yet. Click + Add Tip.</td></tr>
+                <tr><td colSpan={9} style={{ textAlign: "center", color: "#64748b" }}>No tips for this date. Click + Add Tip.</td></tr>
               ) : filtered.map((tip) => (
                 <tr key={tip.id}>
                   <td style={{ color: "#64748b" }}>{tip.kickoffTime}</td>
@@ -135,24 +167,20 @@ const TipsManagement = () => {
                   <td><span className={`badge ${LEVEL_BADGE[tip.level]}`}>{tip.level}</span></td>
                   <td>{tip.sent ? <span className="badge badge-green">✓ Sent</span> : <span className="badge badge-red">Pending</span>}</td>
                   <td>
-  <select
-    value={tip.status}
-    onChange={(e) => handleStatusUpdate(tip.id, e.target.value)}
-    style={{
-      background: tip.status === "WON" ? "#064e3b" : tip.status === "LOST" ? "#7f1d1d" : "#1e293b",
-      color: tip.status === "WON" ? "#10b981" : tip.status === "LOST" ? "#ef4444" : "#94a3b8",
-      border: "none",
-      borderRadius: "6px",
-      padding: "4px 8px",
-      fontWeight: 600,
-      cursor: "pointer"
-    }}
-  >
-    <option value="PENDING">⏳ Pending</option>
-    <option value="WON">✅ Won</option>
-    <option value="LOST">❌ Lost</option>
-  </select>
-</td>
+                    <select
+                      value={tip.status}
+                      onChange={(e) => handleStatusUpdate(tip.id, e.target.value)}
+                      style={{
+                        background: tip.status === "WON" ? "#064e3b" : tip.status === "LOST" ? "#7f1d1d" : "#1e293b",
+                        color: tip.status === "WON" ? "#10b981" : tip.status === "LOST" ? "#ef4444" : "#94a3b8",
+                        border: "none", borderRadius: "6px", padding: "4px 8px", fontWeight: 600, cursor: "pointer",
+                      }}
+                    >
+                      <option value="PENDING">⏳ Pending</option>
+                      <option value="WON">✅ Won</option>
+                      <option value="LOST">❌ Lost</option>
+                    </select>
+                  </td>
                   <td>
                     <div style={{ display: "flex", gap: 6 }}>
                       <button className="btn-icon" onClick={() => openEdit(tip)}>✏️</button>

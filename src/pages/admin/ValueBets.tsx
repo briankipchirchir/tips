@@ -19,10 +19,10 @@ interface VBPrediction {
 }
 
 const TABS: { key: VBCategory; label: string }[] = [
-  { key: "SPORTPESA",     label: "SportPesa"     },
-  { key: "BETIKA",        label: "Betika"         },
-  { key: "CORRECT_SCORE", label: "Correct Score"  },
-  { key: "GOAL_RANGE",    label: "Goal Range"     },
+  { key: "SPORTPESA",     label: "SportPesa"    },
+  { key: "BETIKA",        label: "Betika"        },
+  { key: "CORRECT_SCORE", label: "Correct Score" },
+  { key: "GOAL_RANGE",    label: "Goal Range"    },
 ];
 
 const EMPTY_FORM = {
@@ -33,6 +33,7 @@ const EMPTY_FORM = {
 const ValueBetsAdmin = () => {
   const [predictions, setPredictions] = useState<VBPrediction[]>([]);
   const [activeTab, setActiveTab] = useState<VBCategory>("SPORTPESA");
+  const [filterDate, setFilterDate] = useState(new Date().toISOString().slice(0, 10));
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_FORM });
@@ -41,23 +42,35 @@ const ValueBetsAdmin = () => {
 
   const fetchPredictions = () => {
     setLoading(true);
-    adminApi.getValueBets(activeTab.toLowerCase().replace("_", "-"))
+    // Pass both category and date to the API
+    adminApi.getValueBets(activeTab.toLowerCase().replace("_", "-"), filterDate)
       .then((res) => setPredictions(res.data))
       .catch(() => setPredictions([]))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchPredictions(); }, [activeTab]);
+  useEffect(() => { fetchPredictions(); }, [activeTab, filterDate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.name === "matchNumber" || e.target.name === "confidence"
-      ? Number(e.target.value) : e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.name === "matchNumber" || e.target.name === "confidence"
+        ? Number(e.target.value)
+        : e.target.value,
+    });
   };
 
-  const openAdd = () => { setForm({ ...EMPTY_FORM }); setEditId(null); setShowModal(true); };
+  const openAdd = () => {
+    setForm({ ...EMPTY_FORM, gameDate: filterDate });
+    setEditId(null);
+    setShowModal(true);
+  };
   const openEdit = (p: VBPrediction) => {
-    setForm({ matchNumber: p.matchNumber, league: p.league, gameDate: p.gameDate,
-      fixture: p.fixture, pick: p.pick, odds: p.odds || "", confidence: p.confidence, analysis: p.analysis || "" });
+    setForm({
+      matchNumber: p.matchNumber, league: p.league, gameDate: p.gameDate,
+      fixture: p.fixture, pick: p.pick, odds: p.odds || "",
+      confidence: p.confidence, analysis: p.analysis || "",
+    });
     setEditId(p.id);
     setShowModal(true);
   };
@@ -87,12 +100,18 @@ const ValueBetsAdmin = () => {
     fetchPredictions();
   };
 
+  const isToday = filterDate === new Date().toISOString().slice(0, 10);
+
   return (
     <AdminLayout title="Value Bets Management">
+      {/* ── Category tabs ── */}
       <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
         {TABS.map((t) => (
-          <button key={t.key} onClick={() => setActiveTab(t.key)}
-            className={activeTab === t.key ? "btn-primary" : "btn-secondary"}>
+          <button
+            key={t.key}
+            onClick={() => setActiveTab(t.key)}
+            className={activeTab === t.key ? "btn-primary" : "btn-secondary"}
+          >
             {t.label}
           </button>
         ))}
@@ -100,8 +119,30 @@ const ValueBetsAdmin = () => {
 
       <div className="admin-section">
         <div className="admin-section-header">
-          <span className="admin-section-title">{TABS.find((t) => t.key === activeTab)?.label} Predictions</span>
-          <button className="btn-primary" onClick={openAdd}>+ Add Prediction</button>
+          <span className="admin-section-title">
+            {TABS.find((t) => t.key === activeTab)?.label} — {isToday ? "Today" : new Date(filterDate + "T00:00:00").toLocaleDateString("en-KE", { dateStyle: "long" })}
+          </span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            {/* ── Date picker ── */}
+            <input
+              className="form-input"
+              type="date"
+              style={{ width: "auto" }}
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              title="Pick a date"
+            />
+            {!isToday && (
+              <button
+                className="btn-secondary"
+                style={{ padding: "6px 10px", fontSize: "0.78rem" }}
+                onClick={() => setFilterDate(new Date().toISOString().slice(0, 10))}
+              >
+                Today
+              </button>
+            )}
+            <button className="btn-primary" onClick={openAdd}>+ Add Prediction</button>
+          </div>
         </div>
 
         {loading ? (
@@ -109,7 +150,7 @@ const ValueBetsAdmin = () => {
         ) : predictions.length === 0 ? (
           <div style={{ padding: "48px 20px", textAlign: "center", color: "#475569" }}>
             <div style={{ fontSize: "2.5rem", marginBottom: 10 }}>📋</div>
-            <p>No predictions yet. Click <strong>+ Add Prediction</strong> to get started.</p>
+            <p>No predictions for this date. Click <strong>+ Add Prediction</strong> to get started.</p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>

@@ -96,8 +96,10 @@ export const adminApi = {
   createTip: (data: object) => api.post("/api/admin/tips", data),
   updateTip: (id: string, data: object) => api.put(`/api/admin/tips/${id}`, data),
   deleteTip: (id: string) => api.delete(`/api/admin/tips/${id}`),
-  getValueBets: (category: string) =>
-    api.get(`/api/admin/value-bets/${category}`),
+  getValueBets: (category: string, filterDate?: string) =>
+  api.get(`/api/admin/value-bets/${category}`, {
+    params: filterDate ? { date: filterDate } : {},
+  }),
   createValueBet: (data: object) => api.post("/api/admin/value-bets", data),
   updateValueBet: (id: string, data: object) =>
     api.put(`/api/admin/value-bets/${id}`, data),

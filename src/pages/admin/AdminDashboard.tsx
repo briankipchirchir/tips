@@ -21,20 +21,28 @@ interface User {
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState<Stats>({
-    totalUsers: 0, activeSubscriptions: 0, totalRevenue: 0, successfulPayments: 0
+    totalUsers: 0, activeSubscriptions: 0, totalRevenue: 0, successfulPayments: 0,
   });
   const [recentUsers, setRecentUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterDate, setFilterDate] = useState("");
 
   useEffect(() => {
     Promise.all([adminApi.getStats(), adminApi.getUsers()])
       .then(([statsRes, usersRes]) => {
         setStats(statsRes.data);
-        setRecentUsers(usersRes.data.slice(0, 5));
+        setRecentUsers(usersRes.data);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  // Apply date filter; if no date show the 5 most recent
+  const displayedUsers = filterDate
+    ? recentUsers.filter(
+        (u) => new Date(u.createdAt).toISOString().slice(0, 10) === filterDate
+      )
+    : recentUsers.slice(0, 5);
 
   const STAT_CARDS = [
     { label: "Total Users",         value: stats.totalUsers,          icon: "👥", bg: "rgba(59,130,246,0.12)"  },
@@ -71,9 +79,37 @@ const AdminDashboard = () => {
 
       <div className="admin-section">
         <div className="admin-section-header">
-          <span className="admin-section-title">Recent Users</span>
-          <Link to="/admin/users" className="btn-secondary" style={{ textDecoration: "none", fontSize: "0.8rem" }}>View All</Link>
+          <span className="admin-section-title">
+            {filterDate
+              ? `Users who joined on ${new Date(filterDate + "T00:00:00").toLocaleDateString("en-KE", { dateStyle: "long" })}`
+              : "Recent Users"}
+          </span>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {/* ── Date picker ── */}
+            <input
+              className="form-input"
+              type="date"
+              style={{ width: "auto" }}
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              title="Filter users by join date"
+            />
+            {filterDate ? (
+              <button
+                className="btn-secondary"
+                style={{ padding: "6px 10px", fontSize: "0.78rem" }}
+                onClick={() => setFilterDate("")}
+              >
+                ✕ Clear
+              </button>
+            ) : (
+              <Link to="/admin/users" className="btn-secondary" style={{ textDecoration: "none", fontSize: "0.8rem" }}>
+                View All
+              </Link>
+            )}
+          </div>
         </div>
+
         <div style={{ overflowX: "auto" }}>
           <table className="admin-table">
             <thead>
@@ -82,9 +118,11 @@ const AdminDashboard = () => {
             <tbody>
               {loading ? (
                 <tr><td colSpan={5} style={{ textAlign: "center", color: "#64748b" }}>Loading...</td></tr>
-              ) : recentUsers.length === 0 ? (
-                <tr><td colSpan={5} style={{ textAlign: "center", color: "#64748b" }}>No users yet</td></tr>
-              ) : recentUsers.map((u) => (
+              ) : displayedUsers.length === 0 ? (
+                <tr><td colSpan={5} style={{ textAlign: "center", color: "#64748b" }}>
+                  {filterDate ? "No users joined on this date" : "No users yet"}
+                </td></tr>
+              ) : displayedUsers.map((u) => (
                 <tr key={u.id}>
                   <td style={{ color: "#f1f5f9", fontWeight: 600 }}>{u.fullName}</td>
                   <td>{u.phone}</td>

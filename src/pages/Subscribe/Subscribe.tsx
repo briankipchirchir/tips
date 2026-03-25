@@ -51,7 +51,6 @@ const Subscribe = () => {
   const effectiveSmsNumber = sameNumber ? mpesaNumber : smsNumber;
   const payPlan: PlanLevel = activeTab === "valuebets" ? "VALUE_BETS" : selectedPlan;
   const payDuration = activeTab === "valuebets" ? "ONE_DAY" : DURATION_MAP[selectedDuration];
-  const [paymentRef, setPaymentRef] = useState("");
 const [polling,    setPolling]    = useState(false);
 
 
@@ -72,7 +71,7 @@ const startPolling = (ref: string) => {
         setPolling(false);
         await refreshProfile();
         setStep("confirmed");
-        startPolling(paymentRef);
+        
       } else if (status === "FAILED" || attempts >= maxAttempts) {
         clearInterval(interval);
         setPolling(false);
@@ -98,7 +97,6 @@ const startPolling = (ref: string) => {
       duration: payDuration,
     });
     const ref = res.data.checkoutRequestId;
-    setPaymentRef(ref);
     setStep("waiting");
     startPolling(ref);
   } catch (err: any) {
