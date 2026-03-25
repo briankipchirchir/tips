@@ -61,12 +61,14 @@ export const tipsApi = {
     api.get("/api/tips/premium", { params: date ? { date } : {} }),
    getWonTips: (filter: string) =>
     api.get("/api/tips/won", { params: { filter } }),
+   
 };
 
 // ── Value Bets ──
 export const valueBetsApi = {
   getByCategory: (category: string) =>
     api.get(`/api/value-bets/${category}`),
+  
 };
 
 // ── User ──
@@ -110,6 +112,10 @@ export const adminApi = {
   api.patch(`/api/tips/${id}/status`, null, { params: { status } }),
 updateValueBetStatus: (id: string, status: string) =>
   api.patch(`/api/value-bets/${id}/status`, null, { params: { status } }),
+createBulkValueBets: (data: object[]) =>
+    api.post("/api/admin/value-bets/bulk", data),
+  createBulkTips: (data: { tips: object[] }) =>
+    api.post("/api/admin/tips/bulk", data),
 };
 
 export default api;
