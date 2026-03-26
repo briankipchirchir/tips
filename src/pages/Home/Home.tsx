@@ -254,41 +254,58 @@ const Home = () => {
           </p>
         ) : (
           <div className="plans" style={{ marginTop: '24px' }}>
-            {premiumTips.map((tip) => (
-              <div
-                key={tip.id}
-                className="premium-card glow-card"
-                style={{ border: `1px solid ${LEVEL_COLOR[tip.level] || 'var(--glass-border)'}22` }}
-              >
-                <span className="hot-badge">🔥 HOT</span>
-                <span className={`plan-badge ${tip.level}`}>{tip.level}</span>
+          {[0, 1].map((i) => {
+  const tip = premiumTips[i];
 
-                {(userPlan === "NONE" ||
-                  (tip.level === "GOLD" && userPlan === "SILVER") ||
-                  (tip.level === "PLATINUM" && userPlan !== "PLATINUM")) ? (
-                  <div className="blurred">
-                    <p className="league">{tip.league}</p>
-                    <p className="fixture">{tip.fixture}</p>
-                    <p className="tip">Tip: {tip.prediction}</p>
-                    <p className="odds">Odds: {tip.odds}</p>
-                  </div>
-                ) : (
-                  <>
-                    <p className="league">{tip.league}</p>
-                    <p className="fixture">{tip.fixture}</p>
-                    <p className="tip">Tip: {tip.prediction}</p>
-                    <p className="odds">Odds: {tip.odds}</p>
-                  </>
-                )}
+  return (
+    <div
+      key={tip?.id || `placeholder-${i}`}
+      className={`premium-card glow-card ${!tip ? "placeholder" : ""}`}
+      style={{
+        border: `1px solid ${
+          tip ? LEVEL_COLOR[tip.level] || 'var(--glass-border)22' : 'var(--glass-border)22'
+        }`,
+        opacity: tip ? 1 : 0.5,
+      }}
+    >
+      {tip ? (
+        <>
+          <span className="hot-badge">🔥 HOT</span>
+          <span className={`plan-badge ${tip.level}`}>{tip.level}</span>
 
-                {userPlan === "NONE" && (
-                  <div className="overlay">
-                    <p>🔒 Premium Tip</p>
-                    <button onClick={() => navigate('/subscribe')}>Subscribe to Unlock</button>
-                  </div>
-                )}
-              </div>
-            ))}
+          {(userPlan === "NONE" ||
+            (tip.level === "GOLD" && userPlan === "SILVER") ||
+            (tip.level === "PLATINUM" && userPlan !== "PLATINUM")) ? (
+            <div className="blurred">
+              <p className="league">{tip.league}</p>
+              <p className="fixture">{tip.fixture}</p>
+              <p className="tip">Tip: {tip.prediction}</p>
+              <p className="odds">Odds: {tip.odds}</p>
+            </div>
+          ) : (
+            <>
+              <p className="league">{tip.league}</p>
+              <p className="fixture">{tip.fixture}</p>
+              <p className="tip">Tip: {tip.prediction}</p>
+              <p className="odds">Odds: {tip.odds}</p>
+            </>
+          )}
+
+          {userPlan === "NONE" && (
+            <div className="overlay">
+              <p>🔒 Premium Tip</p>
+              <button onClick={() => navigate('/subscribe')}>Subscribe to Unlock</button>
+            </div>
+          )}
+        </>
+      ) : (
+        <p style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-dim)' }}>
+          Tip coming soon!
+        </p>
+      )}
+    </div>
+  );
+})}
           </div>
         )}
 
