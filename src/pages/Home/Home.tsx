@@ -257,62 +257,63 @@ const Home = () => {
       {[0, 1].map((i) => {
         const tip = premiumTips[i];
 
+        // 👇 FAKE LOCKED TIP (used when no real tip exists)
+        const fakeTip = {
+          league: "Premium League",
+          fixture: "Top Match",
+          prediction: "Win / Over 2.5",
+          odds: "2.10",
+          level: i === 0 ? "GOLD" : "PLATINUM",
+        };
+
+        const displayTip = tip || fakeTip;
+        const isLocked = !tip || userPlan === "NONE" ||
+          (displayTip.level === "GOLD" && userPlan === "SILVER") ||
+          (displayTip.level === "PLATINUM" && userPlan !== "PLATINUM");
+
         return (
           <div
-            key={tip?.id || `placeholder-${i}`}
-            className={`premium-card glow-card ${!tip ? "placeholder" : ""}`}
+            key={tip?.id || `locked-${i}`}
+            className="premium-card glow-card"
             style={{
               border: `1px solid ${
-                tip
-                  ? LEVEL_COLOR[tip.level] || 'var(--glass-border)'
-                  : 'var(--glass-border)'
+                LEVEL_COLOR[displayTip.level] || 'var(--glass-border)'
               }22`,
-              opacity: tip ? 1 : 0.6,
+              opacity: tip ? 1 : 0.85,
             }}
           >
-            {tip ? (
-              <>
-                {/* HOT BADGE */}
-                <span className="hot-badge">🔥 HOT</span>
+            {/* HOT BADGE */}
+            <span className="hot-badge">🔥 HOT</span>
 
-                {/* PLAN BADGE */}
-                <span className={`plan-badge ${tip.level}`}>
-                  {tip.level}
-                </span>
+            {/* PLAN BADGE */}
+            <span className={`plan-badge ${displayTip.level}`}>
+              {displayTip.level}
+            </span>
 
-                {(userPlan === "NONE" ||
-                  (tip.level === "GOLD" && userPlan === "SILVER") ||
-                  (tip.level === "PLATINUM" && userPlan !== "PLATINUM")) ? (
-                  <div className="blurred">
-                    <p className="league">{tip.league}</p>
-                    <p className="fixture">{tip.fixture}</p>
-                    <p className="tip">Tip: {tip.prediction}</p>
-                    <p className="odds">Odds: {tip.odds}</p>
-                  </div>
-                ) : (
-                  <>
-                    <p className="league">{tip.league}</p>
-                    <p className="fixture">{tip.fixture}</p>
-                    <p className="tip">Tip: {tip.prediction}</p>
-                    <p className="odds">Odds: {tip.odds}</p>
-                  </>
-                )}
-
-                {/* LOCK OVERLAY */}
-                {userPlan === "NONE" && (
-                  <div className="overlay">
-                    <p>🔒 Premium Tip</p>
-                    <button onClick={() => navigate('/subscribe')}>
-                      Subscribe to Unlock
-                    </button>
-                  </div>
-                )}
-              </>
+            {/* CONTENT */}
+            {isLocked ? (
+              <div className="blurred">
+                <p className="league">{displayTip.league}</p>
+                <p className="fixture">{displayTip.fixture}</p>
+                <p className="tip">Tip: {displayTip.prediction}</p>
+                <p className="odds">Odds: {displayTip.odds}</p>
+              </div>
             ) : (
-              /* PLACEHOLDER CARD */
-              <div className="placeholder-content">
-                <p>⚡ New Tip Coming Soon</p>
-                <small>Stay tuned — updated daily</small>
+              <>
+                <p className="league">{displayTip.league}</p>
+                <p className="fixture">{displayTip.fixture}</p>
+                <p className="tip">Tip: {displayTip.prediction}</p>
+                <p className="odds">Odds: {displayTip.odds}</p>
+              </>
+            )}
+
+            {/* LOCK OVERLAY (always show if locked) */}
+            {isLocked && (
+              <div className="overlay">
+                <p>🔒 Premium Tip</p>
+                <button onClick={() => navigate('/subscribe')}>
+                  Subscribe to Unlock
+                </button>
               </div>
             )}
           </div>

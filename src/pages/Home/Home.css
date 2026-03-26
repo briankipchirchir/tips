@@ -990,3 +990,141 @@ body {
   margin-bottom: 6px;
   color: #22c55e;
 }
+
+.hot-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(45deg, #ff4d4d, #ff9900);
+  color: white;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 20px;
+  animation: hotPulse 1.2s infinite ease-in-out;
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.7);
+}
+
+@keyframes hotPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.premium-card {
+  position: relative;
+  border-radius: 16px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* glowing animated border */
+.premium-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    #22c55e,
+    #3b82f6,
+    #22c55e,
+    transparent
+  );
+  background-size: 300% 300%;
+  animation: borderGlow 4s linear infinite;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.premium-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: 16px;
+  z-index: 1;
+}
+
+/* keep content above glow */
+.premium-card * {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes borderGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
+  }
+}
+.premium-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.odds {
+  font-weight: bold;
+  background: linear-gradient(
+    90deg,
+    #22c55e,
+    #4ade80,
+    #22c55e
+  );
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 200%;
+  }
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  animation: fadeIn 0.4s ease;
+}
+
+.overlay button {
+  margin-top: 10px;
+  background: linear-gradient(45deg, #22c55e, #16a34a);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.overlay button:hover {
+  transform: scale(1.05);
+}
