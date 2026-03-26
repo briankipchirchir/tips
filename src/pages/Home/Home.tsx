@@ -32,17 +32,14 @@ const Home = () => {
     return d.toISOString().slice(0, 10);
   };
 
-  // Fetch free tips when day changes
   useEffect(() => {
     setTipsLoading(true);
-
     tipsApi.getFreeTips(getDate(activeDay))
       .then((res) => setFreeTips(res.data))
       .catch(() => setFreeTips([]))
       .finally(() => setTipsLoading(false));
   }, [activeDay]);
 
-  // Fetch premium tips preview on mount
   useEffect(() => {
     tipsApi.getPremiumTips()
       .then((res) => setPremiumTips(res.data.slice(0, 3)))
@@ -58,127 +55,161 @@ const Home = () => {
   };
 
   const [wonTips, setWonTips] = useState<Record<string, Tip[]>>({ silver: [], gold: [], platinum: [] });
-const [wonTipsLoading, setWonTipsLoading] = useState(false);
+  const [wonTipsLoading, setWonTipsLoading] = useState(false);
 
-useEffect(() => {
-  setWonTipsLoading(true);
-   setOpenPlan("silver");
-  tipsApi.getWonTips(wonTipsFilter)
-    .then((res) => {
-      const grouped: Record<string, Tip[]> = { silver: [], gold: [], platinum: [] };
-      res.data.forEach((tip: Tip) => {
-        const key = tip.level.toLowerCase();
-        if (grouped[key]) grouped[key].push(tip);
-      });
-      setWonTips(grouped);
-    })
-    .catch(() => setWonTips({ silver: [], gold: [], platinum: [] }))
-    .finally(() => setWonTipsLoading(false));
-}, [wonTipsFilter]);
+  useEffect(() => {
+    setWonTipsLoading(true);
+    setOpenPlan("silver");
+    tipsApi.getWonTips(wonTipsFilter)
+      .then((res) => {
+        const grouped: Record<string, Tip[]> = { silver: [], gold: [], platinum: [] };
+        res.data.forEach((tip: Tip) => {
+          const key = tip.level.toLowerCase();
+          if (grouped[key]) grouped[key].push(tip);
+        });
+        setWonTips(grouped);
+      })
+      .catch(() => setWonTips({ silver: [], gold: [], platinum: [] }))
+      .finally(() => setWonTipsLoading(false));
+  }, [wonTipsFilter]);
+
   return (
     <main className="home">
-      {/* HERO */}
+
+      {/* ── HERO ── */}
       <section className="hero">
-        <p style={{ textAlign: 'center', color: '#f87171', fontWeight: '600' }}>
-  ⚡ Limited Winning Tips — Updated Daily
-</p>
+        <div className="hero-pitch" />
+
+        <div className="hero-alert">
+          ⚡ Limited Winning Tips — Updated Daily
+        </div>
+
         <p className="hero-tag">Welcome to BetTips</p>
-        <h1>Your Ultimate Source for Accurate Football Predictions</h1>
-        <p className="hero-sub">Expert analysis, reliable tips, and daily winning strategies.</p>
+
+        <h1>
+          Your Ultimate Source for<br />
+          <span>Accurate Football</span> Predictions
+        </h1>
+
+        <p className="hero-sub">
+          Expert analysis, reliable tips, and daily winning strategies — delivered straight to you.
+        </p>
+
+        <div className="hero-stats">
+          <div className="hero-stat">
+            <div className="hero-stat-num">94%</div>
+            <div className="hero-stat-label">Win Rate</div>
+          </div>
+          <div className="hero-stat">
+            <div className="hero-stat-num">40+</div>
+            <div className="hero-stat-label">Leagues</div>
+          </div>
+          <div className="hero-stat">
+            <div className="hero-stat-num">5K+</div>
+            <div className="hero-stat-label">Members</div>
+          </div>
+        </div>
+
         <div className="hero-buttons">
-          <button className="btn-primary" onClick={() => navigate("/free-tips")}>View Free Tips</button>
-          <button className="btn-outline" onClick={() => navigate("/subscribe")}>Subscribe Now</button>
+          <button className="btn-primary" onClick={() => navigate("/free-tips")}>
+            View Free Tips
+          </button>
+          <button className="btn-outline" onClick={() => navigate("/subscribe")}>
+            Subscribe Now
+          </button>
         </div>
       </section>
-      
 
-         {/* RECENTLY WON PREMIUM TIPS */}
-<section className="section" style={{ backgroundColor: '#f3f4f6', padding: '3rem 1rem' }}>
-  <div style={{ backgroundColor: 'white', maxWidth: '900px', margin: '0 auto', borderRadius: '12px', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-    <h2 style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem' }}>
-      Recently Won Premium Tips
-    </h2>
-    <div className="filters" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
-      {(['yesterday', 'today', 'week'] as const).map((f) => (
-        <button key={f} className={wonTipsFilter === f ? "active" : ""} onClick={() => setWonTipsFilter(f)}
-          style={{ padding: '0.5rem 1.5rem', borderRadius: '8px', border: wonTipsFilter === f ? '2px solid #10b981' : '2px solid #e5e7eb', backgroundColor: wonTipsFilter === f ? '#10b981' : 'white', color: wonTipsFilter === f ? 'white' : '#6b7280', cursor: 'pointer', fontWeight: '600', fontSize: '0.875rem' }}>
-          {f === 'week' ? 'This Week' : f.charAt(0).toUpperCase() + f.slice(1)}
-        </button>
-      ))}
-    </div>
+      {/* ── RECENTLY WON PREMIUM TIPS ── */}
+      <div className="won-wrapper">
+        <div className="won-inner">
+          <h2 className="won-title">Recently Won Premium Tips</h2>
 
-    {wonTipsLoading ? (
-      <p style={{ textAlign: 'center', color: '#6b7280', padding: '1rem' }}>Loading...</p>
-    ) : (
-      [
-        { key: 'silver', label: 'Silver Plan' },
-        { key: 'gold', label: 'Gold Plan' },
-        { key: 'platinum', label: 'Platinum Plan' },
-      ].map(({ key, label }) => (
-        <div key={key} style={{ marginBottom: '1rem' }}>
-          <button onClick={() => togglePlan(key)} style={{ width: '100%', backgroundColor: '#f9fafb', padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1.125rem', fontWeight: '600' }}>
-            <span>{label}</span>
-            <span style={{ fontSize: '1.5rem' }}>{openPlan === key ? '▼' : '▶'}</span>
-          </button>
-          {openPlan === key && (
-            <div style={{ padding: '1.5rem', backgroundColor: '#f9fafb', marginTop: '0.5rem', borderRadius: '8px' }}>
-              <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
-                {wonTipsFilter === 'yesterday' && `Yesterday's winning ${label} tips`}
-                {wonTipsFilter === 'today' && `Today's winning ${label} tips`}
-                {wonTipsFilter === 'week' && `This week's winning ${label} tips`}
-              </p>
-              {wonTips[key].length === 0 ? (
-                <p style={{ color: '#6b7280', textAlign: 'center', padding: '1rem' }}>
-                  No won tips for this period.
-                </p>
-              ) : (
-                <table style={{ width: '100%', fontSize: '0.875rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
-                      <th style={{ padding: '0.5rem', textAlign: 'left' }}>League</th>
-                      <th style={{ padding: '0.5rem', textAlign: 'left' }}>Match</th>
-                      <th style={{ padding: '0.5rem', textAlign: 'left' }}>Tip</th>
-                      <th style={{ padding: '0.5rem', textAlign: 'center' }}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {wonTips[key].map((tip) => (
-                      <tr key={tip.id}>
-                        <td style={{ padding: '0.5rem' }}>{tip.league}</td>
-                        <td style={{ padding: '0.5rem' }}>{tip.fixture}</td>
-                        <td style={{ padding: '0.5rem' }}>{tip.prediction}</td>
-                        <td style={{ padding: '0.5rem', textAlign: 'center' }}>
-                          <span style={{ color: '#10b981', fontWeight: '600' }}>✓ Won</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+            <div className="filters">
+              {(['yesterday', 'today', 'week'] as const).map((f) => (
+                <button
+                  key={f}
+                  className={wonTipsFilter === f ? "active" : ""}
+                  onClick={() => setWonTipsFilter(f)}
+                >
+                  {f === 'week' ? 'This Week' : f.charAt(0).toUpperCase() + f.slice(1)}
+                </button>
+              ))}
             </div>
+          </div>
+
+          {wonTipsLoading ? (
+            <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '1rem' }}>Loading...</p>
+          ) : (
+            [
+              { key: 'silver', label: 'Silver Plan' },
+              { key: 'gold',   label: 'Gold Plan' },
+              { key: 'platinum', label: 'Platinum Plan' },
+            ].map(({ key, label }) => (
+              <div key={key} className="accordion-item">
+                <button className="accordion-btn" onClick={() => togglePlan(key)}>
+                  <span>{label}</span>
+                  <span style={{ fontSize: '1.1rem', color: 'var(--green)' }}>
+                    {openPlan === key ? '▾' : '▸'}
+                  </span>
+                </button>
+                {openPlan === key && (
+                  <div className="accordion-body">
+                    <p style={{ color: 'var(--text-dim)', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                      {wonTipsFilter === 'yesterday' && `Yesterday's winning ${label} tips`}
+                      {wonTipsFilter === 'today'     && `Today's winning ${label} tips`}
+                      {wonTipsFilter === 'week'      && `This week's winning ${label} tips`}
+                    </p>
+                    {wonTips[key].length === 0 ? (
+                      <p style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '1rem' }}>
+                        No won tips for this period.
+                      </p>
+                    ) : (
+                      <table className="tips-table">
+                        <thead>
+                          <tr>
+                            <th>League</th><th>Match</th><th>Tip</th><th style={{ textAlign: 'center' }}>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {wonTips[key].map((tip) => (
+                            <tr key={tip.id}>
+                              <td>{tip.league}</td>
+                              <td>{tip.fixture}</td>
+                              <td>{tip.prediction}</td>
+                              <td style={{ textAlign: 'center' }}>
+                                <span style={{ color: '#10b981', fontWeight: '700' }}>✓ Won</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
           )}
+
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <Link to="/premium-tips" className="cta-link">
+              View Today's Premium Tips →
+            </Link>
+          </div>
         </div>
-      ))
-    )}
+      </div>
 
-    <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-      <Link to="/premium-tips" style={{ display: 'inline-block', padding: '10px 28px', background: '#10b981', color: 'white', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '0.9rem' }}>
-        View Today's Premium Tips →
-      </Link>
-    </div>
-  </div>
-</section>
-
-      {/* FREE TIPS PREVIEW */}
+      {/* ── FREE TIPS PREVIEW ── */}
       <section className="section" id="free-tips">
         <div className="section-header">
-          <h2 className="section-title">Free Guaranteed Tips</h2>
-          <Link to="/free-tips" className="filter-btn" style={{ textDecoration: 'none', color: '#022c22', fontSize: '0.875rem', fontWeight: '600' }}>
+          <h2 className="section-title" style={{ marginBottom: 0 }}>Free Guaranteed Tips</h2>
+          <Link to="/free-tips" className="filter-btn" style={{ textDecoration: 'none' }}>
             View All →
           </Link>
         </div>
 
-        <div className="filters">
+        <div className="filters" style={{ margin: '24px 0' }}>
           {(["yesterday", "today", "tomorrow"] as const).map((d) => (
             <button key={d} className={activeDay === d ? "active" : ""} onClick={() => setActiveDay(d)}>
               {d.charAt(0).toUpperCase() + d.slice(1)}
@@ -187,177 +218,211 @@ useEffect(() => {
         </div>
 
         {tipsLoading ? (
-          <p style={{ textAlign: 'center', color: '#64748b', padding: '20px' }}>Loading tips...</p>
+          <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '20px' }}>Loading tips...</p>
         ) : freeTips.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#64748b', padding: '20px' }}>
+          <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '20px' }}>
             No free tips available for this day yet.
           </p>
         ) : (
-          <table className="tips-table">
-            <thead>
-              <tr><th>Time</th><th>League</th><th>Fixture</th><th>Tip</th></tr>
-            </thead>
-            <tbody>
-              {freeTips.map((tip) => (
-                <tr key={tip.id}>
-                  <td>{tip.kickoffTime}</td>
-                  <td>{tip.league}</td>
-                  <td>{tip.fixture}</td>
-                  <td>{tip.prediction}</td>
+          <div style={{ background: 'var(--navy-light)', borderRadius: 'var(--radius)', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
+            <table className="tips-table">
+              <thead>
+                <tr>
+                  <th>Time</th><th>League</th><th>Fixture</th><th>Tip</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {freeTips.map((tip) => (
+                  <tr key={tip.id}>
+                    <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{tip.kickoffTime}</td>
+                    <td className="league">{tip.league}</td>
+                    <td className="fixture">{tip.fixture}</td>
+                    <td className="tip">{tip.prediction}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-          <Link to="/free-tips" style={{ display: 'inline-block', padding: '10px 28px', background: 'transparent', border: '1.5px solid #22c55e', color: '#22c55e', borderRadius: '8px', fontWeight: '600', textDecoration: 'none', fontSize: '0.9rem' }}>
+          <Link to="/free-tips" className="cta-link outline">
             See All Free Tips →
           </Link>
         </div>
       </section>
 
-      {/* TODAY'S PREMIUM TIPS PREVIEW */}
+      {/* ── TODAY'S PREMIUM TIPS PREVIEW ── */}
       <section className="section">
         <div className="section-header">
-          <h2 className="section-title">Today's Premium Tips</h2>
-          <Link to="/premium-tips" className="filter-btn" style={{ textDecoration: 'none', color: '#022c22', fontSize: '0.875rem', fontWeight: '600' }}>
+          <h2 className="section-title" style={{ marginBottom: 0 }}>Today's Premium Tips</h2>
+          <Link to="/premium-tips" className="filter-btn" style={{ textDecoration: 'none' }}>
             View All →
           </Link>
         </div>
 
         {premiumTips.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#64748b', padding: '20px' }}>
+          <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '20px', marginTop: '16px' }}>
             No premium tips posted yet today.
           </p>
         ) : (
-         <div className="plans">
-  {premiumTips.map((tip) => (
-    <div
-      key={tip.id}
-      className="premium-card glow-card"
-      style={{
-        border: `1px solid ${LEVEL_COLOR[tip.level] || '#1e293b'}`,
-        position: 'relative'
-      }}
-    >
-      {/* HOT BADGE */}
-      <span className="hot-badge">🔥 HOT</span>
+          <div className="plans" style={{ marginTop: '24px' }}>
+            {premiumTips.map((tip) => (
+              <div
+                key={tip.id}
+                className="premium-card glow-card"
+                style={{ border: `1px solid ${LEVEL_COLOR[tip.level] || 'var(--glass-border)'}22` }}
+              >
+                <span className="hot-badge">🔥 HOT</span>
+                <span className={`plan-badge ${tip.level}`}>{tip.level}</span>
 
-      <span className="plan-badge">{tip.level}</span>
+                {(userPlan === "NONE" ||
+                  (tip.level === "GOLD" && userPlan === "SILVER") ||
+                  (tip.level === "PLATINUM" && userPlan !== "PLATINUM")) ? (
+                  <div className="blurred">
+                    <p className="league">{tip.league}</p>
+                    <p className="fixture">{tip.fixture}</p>
+                    <p className="tip">Tip: {tip.prediction}</p>
+                    <p className="odds">Odds: {tip.odds}</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="league">{tip.league}</p>
+                    <p className="fixture">{tip.fixture}</p>
+                    <p className="tip">Tip: {tip.prediction}</p>
+                    <p className="odds">Odds: {tip.odds}</p>
+                  </>
+                )}
 
-      {(userPlan === "NONE" ||
-        (tip.level === "GOLD" && userPlan === "SILVER") ||
-        (tip.level === "PLATINUM" && userPlan !== "PLATINUM")) ? (
-        <div className="blurred">
-          <p className="league">{tip.league}</p>
-          <p className="fixture">{tip.fixture}</p>
-          <p className="tip">Tip: {tip.prediction}</p>
-          <p className="odds">Odds: {tip.odds}</p>
-        </div>
-      ) : (
-        <>
-          <p className="league">{tip.league}</p>
-          <p className="fixture">{tip.fixture}</p>
-          <p className="tip">Tip: {tip.prediction}</p>
-          <p className="odds">Odds: {tip.odds}</p>
-        </>
-      )}
-
-      {userPlan === "NONE" && (
-        <div className="overlay">
-          <p>🔒 Premium Tip</p>
-          <button onClick={() => navigate('/subscribe')}>
-            Subscribe to Unlock
-          </button>
-        </div>
-      )}
-    </div>
-  ))}
-</div>
+                {userPlan === "NONE" && (
+                  <div className="overlay">
+                    <p>🔒 Premium Tip</p>
+                    <button onClick={() => navigate('/subscribe')}>Subscribe to Unlock</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         )}
 
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <Link to="/premium-tips" style={{ display: 'inline-block', padding: '10px 28px', background: 'transparent', border: '1.5px solid #22c55e', color: '#22c55e', borderRadius: '8px', fontWeight: '600', textDecoration: 'none', fontSize: '0.9rem' }}>
+          <Link to="/premium-tips" className="cta-link outline">
             View All Premium Tips →
           </Link>
         </div>
       </section>
 
-      {/* PREMIUM PLANS */}
+      {/* ── PREMIUM PLANS ── */}
       <section className="section dark" id="premium-plans">
-        <h2 className="section-title" style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Premium Plans</h2>
-        <div className="plans" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '800px', margin: '0 auto' }}>
+        <h2 className="section-title" style={{ fontSize: '2.8rem' }}>Premium Plans</h2>
+
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           {[
-            { label: 'Silver Plan', bg: '#d1fae5', color: '#065f46', stars: '⭐⭐⭐⭐⭐', desc: 'Get sure 3-5 odds daily and earn consistently. Tips are sent instantly via SMS.', price: 'KSH. 50' },
-            { label: 'Gold Plan',   bg: '#fef3c7', color: '#92400e', stars: '⭐⭐⭐⭐✨', desc: 'Get sure 5-7 odds daily and earn consistently. Tips are sent instantly via SMS.', price: 'KSH. 70' },
-            { label: 'Platinum Plan', bg: '#e0e7ff', color: '#3730a3', stars: '⭐⭐⭐⭐☆', desc: 'Get sure 8-15 odds daily and earn consistently. Tips are sent instantly via SMS.', price: 'KSH. 100' },
+            {
+              key: 'silver', chip: 'silver', label: 'Silver Plan',
+              stars: '⭐⭐⭐⭐⭐',
+              desc: 'Get sure 3–5 odds daily and earn consistently. Tips are sent instantly via SMS.',
+              price: 'KSH. 50',
+            },
+            {
+              key: 'gold', chip: 'gold', label: 'Gold Plan',
+              stars: '⭐⭐⭐⭐✨',
+              desc: 'Get sure 5–7 odds daily and earn consistently. Tips are sent instantly via SMS.',
+              price: 'KSH. 70',
+            },
+            {
+              key: 'platinum', chip: 'platinum', label: 'Platinum Plan',
+              stars: '⭐⭐⭐⭐☆',
+              desc: 'Get sure 8–15 odds daily and earn consistently. Tips are sent instantly via SMS.',
+              price: 'KSH. 100',
+            },
           ].map((plan) => (
-            <div key={plan.label} style={{ backgroundColor: '#1a2332', borderRadius: '12px', padding: '2rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                <span style={{ backgroundColor: plan.bg, color: plan.color, padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: '600' }}>{plan.label}</span>
-                <div style={{ color: '#fbbf24', fontSize: '1.25rem' }}>{plan.stars}</div>
+            <div key={plan.key} className="plan-row">
+              <div className="plan-row-top">
+                <span className={`plan-chip ${plan.chip}`}>{plan.label}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ color: '#fbbf24', fontSize: '1.1rem' }}>{plan.stars}</span>
+                  <span className="plan-price">{plan.price}</span>
+                </div>
               </div>
-              <p style={{ color: '#e5e7eb', marginBottom: '1.5rem', lineHeight: '1.6' }}>{plan.desc}</p>
-              <button onClick={() => navigate("/subscribe")} style={{ backgroundColor: '#10b981', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
-                BUY @{plan.price}
+              <p className="plan-desc">{plan.desc}</p>
+              <button className="plan-buy-btn" onClick={() => navigate("/subscribe")}>
+                BUY @ {plan.price}
               </button>
             </div>
           ))}
         </div>
+
         <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-          <Link to="/subscribe" style={{ display: 'inline-block', padding: '12px 36px', background: '#10b981', color: 'white', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '1rem' }}>
+          <Link to="/subscribe" className="cta-link">
             See All Plans & Durations →
           </Link>
         </div>
       </section>
 
-      {/* VALUE BETS */}
+      {/* ── VALUE BETS ── */}
       <section className="section">
         <h2 className="section-title">Value Bets</h2>
         <div className="value-bets">
-          <Link to="/value-bets/sportpesa" className="value-card">SportPesa Jackpot</Link>
-          <Link to="/value-bets/betika" className="value-card">Betika Jackpot</Link>
-          <Link to="/value-bets/correct-score" className="value-card">Correct Score</Link>
-          <Link to="/value-bets/goal-range" className="value-card">Goal Range</Link>
+          <Link to="/value-bets/sportpesa"    className="value-card">🏆 SportPesa Jackpot</Link>
+          <Link to="/value-bets/betika"       className="value-card">💎 Betika Jackpot</Link>
+          <Link to="/value-bets/correct-score" className="value-card">🎯 Correct Score</Link>
+          <Link to="/value-bets/goal-range"   className="value-card">⚽ Goal Range</Link>
         </div>
       </section>
 
- 
-
-      {/* WHY CHOOSE US */}
-      <section className="section" style={{ backgroundColor: '#ffffff', padding: '3rem 1rem' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
-          <p style={{ color: '#10b981', fontSize: '0.875rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>WHY CHOOSE US</p>
-          <h2 style={{ color: '#10b981', fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', lineHeight: '1.3' }}>
-            Best Football Predictions & Betting Tips in Kenya
+      {/* ── WHY CHOOSE US ── */}
+      <div className="why-wrapper">
+        <div className="why-inner">
+          <p className="why-eyebrow">Why Choose Us</p>
+          <h2 className="why-heading">
+            Best Football Predictions &amp;<br />Betting Tips in Kenya
           </h2>
-          <p style={{ color: '#4b5563', fontSize: '1rem', lineHeight: '1.7', marginBottom: '2.5rem' }}>
+          <p className="why-desc">
             Get accurate football betting predictions from Kenya's leading tipsters. We deliver data-driven analysis, sure odds, and winning strategies for Premier League, Champions League, Kenyan Premier League, and 40+ international leagues.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+
+          <div className="why-grid">
             {[
-              { bg: '#d1fae5', iconColor: '#10b981', icon: '✓', title: 'Premium Football Tips', desc: 'Get daily 3+ odds, 5+ odds, and 15+ odds betting tips with guaranteed odds ranging from 3-15x returns.' },
-              { bg: '#dbeafe', iconColor: '#3b82f6', icon: '$', title: 'Jackpot Predictions', desc: 'Expert SportPesa Mega Jackpot and Betika Midweek Jackpot predictions to maximize your chances.' },
-              { bg: '#fef3c7', iconColor: '#f59e0b', icon: '📊', title: 'Betting Strategies', desc: 'Learn winning strategies, bankroll management, and market analysis through our resources.' },
-              { bg: '#e0e7ff', iconColor: '#6366f1', icon: '⏱', title: 'Instant SMS Delivery', desc: 'Get your purchased tips delivered instantly via SMS. Never miss a winning opportunity.' },
+              {
+                bg: 'rgba(16,185,129,0.1)', iconColor: '#10b981', icon: '✓',
+                title: 'Premium Football Tips',
+                desc: 'Get daily 3+ odds, 5+ odds, and 15+ odds betting tips with guaranteed odds ranging from 3–15x returns.',
+              },
+              {
+                bg: 'rgba(59,130,246,0.1)', iconColor: '#3b82f6', icon: '$',
+                title: 'Jackpot Predictions',
+                desc: 'Expert SportPesa Mega Jackpot and Betika Midweek Jackpot predictions to maximise your chances.',
+              },
+              {
+                bg: 'rgba(245,158,11,0.1)', iconColor: '#f59e0b', icon: '📊',
+                title: 'Betting Strategies',
+                desc: 'Learn winning strategies, bankroll management, and market analysis through our resources.',
+              },
+              {
+                bg: 'rgba(99,102,241,0.1)', iconColor: '#6366f1', icon: '⏱',
+                title: 'Instant SMS Delivery',
+                desc: 'Get your purchased tips delivered instantly via SMS. Never miss a winning opportunity.',
+              },
             ].map((f, i) => (
-              <div key={i}>
-                <div style={{ width: '48px', height: '48px', backgroundColor: f.bg, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-                  <span style={{ color: f.iconColor, fontSize: '1.5rem' }}>{f.icon}</span>
+              <div key={i} className="why-card">
+                <div className="why-icon" style={{ background: f.bg }}>
+                  <span style={{ color: f.iconColor, fontSize: '1.3rem' }}>{f.icon}</span>
                 </div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '0.75rem', color: '#111827' }}>{f.title}</h3>
-                <p style={{ color: '#6b7280', lineHeight: '1.6' }}>{f.desc}</p>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
               </div>
             ))}
           </div>
+
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <Link to={user ? "/subscribe" : "/register"} style={{ display: 'inline-block', padding: '14px 40px', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', borderRadius: '10px', fontWeight: '700', textDecoration: 'none', fontSize: '1rem' }}>
+            <Link to={user ? "/subscribe" : "/register"} className="cta-link">
               Get Started — It's Free →
             </Link>
           </div>
         </div>
-      </section>
+      </div>
+
     </main>
   );
 };
