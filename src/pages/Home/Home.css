@@ -52,12 +52,10 @@ body {
   color: white;
 }
 
-/* Goalkeeper background */
-.hero::before {
-  content: '';
+/* Goalkeeper background — set via inline style in TSX using imported asset */
+.hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlqa4WAX7UHAcw060utgV-l4b-09Cu1GtMaJRA5qkLCcIDUgTbQRy48LW-t6bmxR8pBSSXBZUm0sg-_KKjvrp98ZiR3XnWGbA3ahlyG1UZ&s=10');
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -275,7 +273,7 @@ body {
 ───────────────────────────────────────── */
 .won-wrapper {
   background: var(--navy-mid);
-  padding: 72px 24px;
+  padding: 40px 24px;
 }
 
 .won-inner {
@@ -283,7 +281,7 @@ body {
   max-width: 900px;
   margin: 0 auto;
   border-radius: 20px;
-  padding: 2.5rem;
+  padding: 1.5rem 2rem;
   border: 1px solid var(--glass-border);
   box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(34,197,94,0.05);
 }
@@ -291,9 +289,9 @@ body {
 .won-title {
   font-family: 'Bebas Neue', sans-serif;
   color: var(--green);
-  font-size: 2.4rem;
+  font-size: 1.8rem;
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   letter-spacing: 0.05em;
 }
 
@@ -339,7 +337,7 @@ body {
    PLAN ACCORDION
 ───────────────────────────────────────── */
 .accordion-item {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--glass-border);
@@ -348,14 +346,14 @@ body {
 .accordion-btn {
   width: 100%;
   background: rgba(255,255,255,0.03);
-  padding: 1.2rem 1.5rem;
+  padding: 0.9rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   font-family: 'Outfit', sans-serif;
   color: var(--text-primary);
@@ -368,9 +366,24 @@ body {
 }
 
 .accordion-body {
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   background: rgba(255,255,255,0.02);
   border-top: 1px solid var(--glass-border);
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--green) transparent;
+}
+
+.accordion-body::-webkit-scrollbar {
+  width: 4px;
+}
+.accordion-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.accordion-body::-webkit-scrollbar-thumb {
+  background: var(--green);
+  border-radius: 4px;
 }
 
 /* ─────────────────────────────────────────

@@ -3,6 +3,7 @@ import "./Home.css";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { tipsApi } from "../../services/api";
+import GoalBg from "../../assets/Goal.png";
 
 interface Tip {
   id: string;
@@ -78,6 +79,7 @@ const Home = () => {
 
       {/* ── HERO ── */}
       <section className="hero">
+        <div className="hero-bg" style={{ backgroundImage: `url(${GoalBg})` }} />
         <div className="hero-pitch" />
 
         <div className="hero-alert">
@@ -125,7 +127,7 @@ const Home = () => {
         <div className="won-inner">
           <h2 className="won-title">Recently Won Premium Tips</h2>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
             <div className="filters">
               {(['yesterday', 'today', 'week'] as const).map((f) => (
                 <button
