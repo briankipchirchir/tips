@@ -17,7 +17,7 @@ interface Tip {
 const Home = () => {
   const [activeDay, setActiveDay] = useState<"yesterday" | "today" | "tomorrow">("today");
   const [openPlan, setOpenPlan] = useState<string | null>(null);
-  const [wonTipsFilter, setWonTipsFilter] = useState<"yesterday" | "today" | "week">("today");
+  const [wonTipsFilter, setWonTipsFilter] = useState<"yesterday" | "today" | "week">("yesterday");
   const [freeTips, setFreeTips] = useState<Tip[]>([]);
   const [premiumTips, setPremiumTips] = useState<Tip[]>([]);
   const [tipsLoading, setTipsLoading] = useState(true);
@@ -79,6 +79,9 @@ useEffect(() => {
     <main className="home">
       {/* HERO */}
       <section className="hero">
+        <p style={{ textAlign: 'center', color: '#f87171', fontWeight: '600' }}>
+  ⚡ Limited Winning Tips — Updated Daily
+</p>
         <p className="hero-tag">Welcome to BetTips</p>
         <h1>Your Ultimate Source for Accurate Football Predictions</h1>
         <p className="hero-sub">Expert analysis, reliable tips, and daily winning strategies.</p>
@@ -87,6 +90,7 @@ useEffect(() => {
           <button className="btn-outline" onClick={() => navigate("/subscribe")}>Subscribe Now</button>
         </div>
       </section>
+      
 
          {/* RECENTLY WON PREMIUM TIPS */}
 <section className="section" style={{ backgroundColor: '#f3f4f6', padding: '3rem 1rem' }}>
@@ -227,38 +231,50 @@ useEffect(() => {
             No premium tips posted yet today.
           </p>
         ) : (
-          <div className="plans">
-            {premiumTips.map((tip) => (
-              <div key={tip.id} style={{ background: '#0f172a', border: `1px solid ${LEVEL_COLOR[tip.level] || '#1e293b'}`, borderRadius: '12px', padding: '20px', position: 'relative', overflow: 'hidden' }}>
-                <span style={{ display: 'inline-block', background: '#22c55e', color: '#022c22', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', marginBottom: '10px', fontWeight: '700' }}>
-                  {tip.level}
-                </span>
-                {userPlan === "NONE" || (tip.level === "GOLD" && userPlan === "SILVER") || (tip.level === "PLATINUM" && userPlan !== "PLATINUM") ? (
-                  <div style={{ filter: 'blur(4px)', pointerEvents: 'none' }}>
-                    <p style={{ color: '#e5e7eb', fontWeight: '600' }}>{tip.league}</p>
-                    <p style={{ color: '#e5e7eb' }}>{tip.fixture}</p>
-                    <p style={{ color: '#10b981' }}>Tip: {tip.prediction}</p>
-                    <p style={{ color: '#f59e0b' }}>Odds: {tip.odds}</p>
-                  </div>
-                ) : (
-                  <>
-                    <p style={{ color: '#e5e7eb', fontWeight: '600' }}>{tip.league}</p>
-                    <p style={{ color: '#e5e7eb' }}>{tip.fixture}</p>
-                    <p style={{ color: '#10b981' }}>Tip: {tip.prediction}</p>
-                    <p style={{ color: '#f59e0b' }}>Odds: {tip.odds}</p>
-                  </>
-                )}
-                {(userPlan === "NONE") && (
-                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.7)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <p style={{ color: 'white' }}>🔒 Premium Tip</p>
-                    <button onClick={() => navigate('/subscribe')} style={{ background: '#22c55e', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>
-                      Subscribe to Unlock
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+         <div className="plans">
+  {premiumTips.map((tip) => (
+    <div
+      key={tip.id}
+      className="premium-card glow-card"
+      style={{
+        border: `1px solid ${LEVEL_COLOR[tip.level] || '#1e293b'}`,
+        position: 'relative'
+      }}
+    >
+      {/* HOT BADGE */}
+      <span className="hot-badge">🔥 HOT</span>
+
+      <span className="plan-badge">{tip.level}</span>
+
+      {(userPlan === "NONE" ||
+        (tip.level === "GOLD" && userPlan === "SILVER") ||
+        (tip.level === "PLATINUM" && userPlan !== "PLATINUM")) ? (
+        <div className="blurred">
+          <p className="league">{tip.league}</p>
+          <p className="fixture">{tip.fixture}</p>
+          <p className="tip">Tip: {tip.prediction}</p>
+          <p className="odds">Odds: {tip.odds}</p>
+        </div>
+      ) : (
+        <>
+          <p className="league">{tip.league}</p>
+          <p className="fixture">{tip.fixture}</p>
+          <p className="tip">Tip: {tip.prediction}</p>
+          <p className="odds">Odds: {tip.odds}</p>
+        </>
+      )}
+
+      {userPlan === "NONE" && (
+        <div className="overlay">
+          <p>🔒 Premium Tip</p>
+          <button onClick={() => navigate('/subscribe')}>
+            Subscribe to Unlock
+          </button>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
         )}
 
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
