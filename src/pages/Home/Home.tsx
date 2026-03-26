@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./Home.css";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,6 +13,25 @@ interface Tip {
   odds: string;
   kickoffTime: string;
   level: string;
+}
+
+
+function useCountUp(target: number, duration = 2000, start = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    let startTime: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+      else setCount(target);
+    };
+    requestAnimationFrame(step);
+  }, [start, target, duration]);
+  return count;
 }
 
 const Home = () => {
@@ -32,6 +51,22 @@ const Home = () => {
     if (day === "tomorrow") d.setDate(d.getDate() + 1);
     return d.toISOString().slice(0, 10);
   };
+
+  const [statsVisible, setStatsVisible] = useState(false);
+const statsRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    ([entry]) => { if (entry.isIntersecting) setStatsVisible(true); },
+    { threshold: 0.4 }
+  );
+  if (statsRef.current) observer.observe(statsRef.current);
+  return () => observer.disconnect();
+}, []);
+
+const winRate = useCountUp(94, 1800, statsVisible);
+const leagues = useCountUp(40, 1400, statsVisible);
+const members = useCountUp(5000, 2000, statsVisible);
 
   useEffect(() => {
     setTipsLoading(true);
@@ -96,20 +131,20 @@ const Home = () => {
           Expert analysis, reliable tips, and daily winning strategies — delivered straight to you.
         </p>
 
-        <div className="hero-stats">
-          <div className="hero-stat">
-            <div className="hero-stat-num">94%</div>
-            <div className="hero-stat-label">Win Rate</div>
-          </div>
-          <div className="hero-stat">
-            <div className="hero-stat-num">40+</div>
-            <div className="hero-stat-label">Leagues</div>
-          </div>
-          <div className="hero-stat">
-            <div className="hero-stat-num">5K+</div>
-            <div className="hero-stat-label">Members</div>
-          </div>
-        </div>
+       <div className="hero-stats" ref={statsRef}>
+  <div className="hero-stat">
+    <div className="hero-stat-num">{winRate}%</div>
+    <div className="hero-stat-label">Win Rate</div>
+  </div>
+  <div className="hero-stat">
+    <div className="hero-stat-num">{leagues}+</div>
+    <div className="hero-stat-label">Leagues</div>
+  </div>
+  <div className="hero-stat">
+    <div className="hero-stat-num">{members >= 1000 ? `${(members / 1000).toFixed(members % 1000 === 0 ? 0 : 1)}K` : members}+</div>
+    <div className="hero-stat-label">Members</div>
+  </div>
+</div>
 
         <div className="hero-buttons">
           <button className="btn-primary" onClick={() => navigate("/free-tips")}>
