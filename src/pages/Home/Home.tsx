@@ -125,9 +125,10 @@ const Home = () => {
       {/* ── RECENTLY WON PREMIUM TIPS ── */}
       <div className="won-wrapper">
         <div className="won-inner">
-          <h2 className="won-title">Recently Won Premium Tips</h2>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+          {/* Header row */}
+          <div className="won-header">
+            <h2 className="won-title">🏆 Recently Won Tips</h2>
             <div className="filters">
               {(['yesterday', 'today', 'week'] as const).map((f) => (
                 <button
@@ -141,60 +142,45 @@ const Home = () => {
             </div>
           </div>
 
+          {/* Plan tabs */}
+          <div className="won-plan-tabs">
+            {(['silver', 'gold', 'platinum'] as const).map((key) => (
+              <button
+                key={key}
+                className={`won-plan-tab won-plan-tab--${key} ${openPlan === key ? 'active' : ''}`}
+                onClick={() => setOpenPlan(key)}
+              >
+                {key === 'silver' && '⚪'}
+                {key === 'gold'   && '🟡'}
+                {key === 'platinum' && '🔵'}
+                {' '}{key.charAt(0).toUpperCase() + key.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {/* Tips grid — no scroll, compact cards */}
           {wonTipsLoading ? (
-            <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '1rem' }}>Loading...</p>
+            <p className="won-loading">Loading...</p>
           ) : (
-            [
-              { key: 'silver', label: 'Silver Plan' },
-              { key: 'gold',   label: 'Gold Plan' },
-              { key: 'platinum', label: 'Platinum Plan' },
-            ].map(({ key, label }) => (
-              <div key={key} className="accordion-item">
-                <button className="accordion-btn" onClick={() => togglePlan(key)}>
-                  <span>{label}</span>
-                  <span style={{ fontSize: '1.1rem', color: 'var(--green)' }}>
-                    {openPlan === key ? '▾' : '▸'}
-                  </span>
-                </button>
-                {openPlan === key && (
-                  <div className="accordion-body">
-                    <p style={{ color: 'var(--text-dim)', marginBottom: '1rem', fontSize: '0.875rem' }}>
-                      {wonTipsFilter === 'yesterday' && `Yesterday's winning ${label} tips`}
-                      {wonTipsFilter === 'today'     && `Today's winning ${label} tips`}
-                      {wonTipsFilter === 'week'      && `This week's winning ${label} tips`}
-                    </p>
-                    {wonTips[key].length === 0 ? (
-                      <p style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '1rem' }}>
-                        No won tips for this period.
-                      </p>
-                    ) : (
-                      <table className="tips-table">
-                        <thead>
-                          <tr>
-                            <th>League</th><th>Match</th><th>Tip</th><th style={{ textAlign: 'center' }}>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {wonTips[key].map((tip) => (
-                            <tr key={tip.id}>
-                              <td>{tip.league}</td>
-                              <td>{tip.fixture}</td>
-                              <td>{tip.prediction}</td>
-                              <td style={{ textAlign: 'center' }}>
-                                <span style={{ color: '#10b981', fontWeight: '700' }}>✓ Won</span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
+            <div className="won-cards-grid">
+              {!openPlan || wonTips[openPlan]?.length === 0 ? (
+                <p className="won-empty">No won tips for this period.</p>
+              ) : (
+                wonTips[openPlan].map((tip) => (
+                  <div key={tip.id} className="won-tip-card">
+                    <div className="won-tip-top">
+                      <span className="won-tip-league">{tip.league}</span>
+                      <span className="won-tip-status">✓ Won</span>
+                    </div>
+                    <div className="won-tip-fixture">{tip.fixture}</div>
+                    <div className="won-tip-prediction">{tip.prediction}</div>
                   </div>
-                )}
-              </div>
-            ))
+                ))
+              )}
+            </div>
           )}
 
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <div style={{ textAlign: 'center', marginTop: '1.2rem' }}>
             <Link to="/premium-tips" className="cta-link">
               View Today's Premium Tips →
             </Link>
