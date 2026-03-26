@@ -185,7 +185,7 @@ if (step === "failed") {
   </div>
 
   <a
-    href="https://wa.me/254700000000?text=Hi%2C%20I%27d%20like%20to%20subscribe%20to%20a%20BetTips%20plan%20from%20outside%20Kenya."
+    href="https://wa.me/254746110366?text=Hi%2C%20I%27d%20like%20to%20subscribe%20to%20a%20BetTips%20plan%20from%20outside%20Kenya."
     target="_blank"
     rel="noopener noreferrer"
     className="intl-wa-btn"
