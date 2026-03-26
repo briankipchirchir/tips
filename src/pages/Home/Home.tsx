@@ -47,9 +47,6 @@ const Home = () => {
       .catch(() => setPremiumTips([]));
   }, []);
 
-  const togglePlan = (plan: string) => {
-    setOpenPlan(openPlan === plan ? null : plan);
-  };
 
   const LEVEL_COLOR: Record<string, string> = {
     FREE: "#10b981", SILVER: "#94a3b8", GOLD: "#f59e0b", PLATINUM: "#818cf8",
