@@ -352,6 +352,7 @@ const Home = () => {
       </section>
 
       {/* ── VALUE BETS ── */}
+      <div className="section-wrapper">
       <section className="section">
         <h2 className="section-title">Value Bets</h2>
         <div className="value-bets">
@@ -361,6 +362,7 @@ const Home = () => {
           <Link to="/value-bets/goal-range"   className="value-card">⚽ Goal Range</Link>
         </div>
       </section>
+      </div>
 
       {/* ── WHY CHOOSE US ── */}
       <div className="why-wrapper">
