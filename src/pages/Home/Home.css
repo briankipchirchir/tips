@@ -963,3 +963,8 @@ body {
   .won-cards-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
   .filters button { padding: 7px 14px; font-size: 0.8rem; }
 }
+
+.section-wrapper {
+  background: var(--navy-mid);
+  padding: 40px 0;
+}

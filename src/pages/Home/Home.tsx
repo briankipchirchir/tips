@@ -188,6 +188,7 @@ const Home = () => {
       </div>
 
       {/* ── FREE TIPS PREVIEW ── */}
+      <div className="section-wrapper">
       <section className="section" id="free-tips">
         <div className="section-header">
           <h2 className="section-title" style={{ marginBottom: 0 }}>Free Guaranteed Tips</h2>
@@ -238,8 +239,10 @@ const Home = () => {
           </Link>
         </div>
       </section>
+      </div>
 
       {/* ── TODAY'S PREMIUM TIPS PREVIEW ── */}
+      <div className="section-wrapper">
       <section className="section">
         <div className="section-header">
           <h2 className="section-title" style={{ marginBottom: 0 }}>Today's Premium Tips</h2>
@@ -298,6 +301,7 @@ const Home = () => {
           </Link>
         </div>
       </section>
+      </div>
 
       {/* ── PREMIUM PLANS ── */}
       <section className="section dark" id="premium-plans">
