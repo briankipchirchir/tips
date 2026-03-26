@@ -110,16 +110,17 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(239,68,68,0.12);
-  border: 1px solid rgba(239,68,68,0.3);
-  color: #f87171;
-  padding: 6px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+  padding: 7px 18px;
   border-radius: 30px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   margin-bottom: 20px;
-  animation: fadeSlideDown 0.6s ease both;
+  animation: alertPulse 2s ease-in-out infinite;
 }
 
 .hero-tag {
