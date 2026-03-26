@@ -41,11 +41,13 @@ const Home = () => {
       .finally(() => setTipsLoading(false));
   }, [activeDay]);
 
+ 
+
   useEffect(() => {
-    tipsApi.getPremiumTips()
-      .then((res) => setPremiumTips(res.data.slice(0, 3)))
-      .catch(() => setPremiumTips([]));
-  }, []);
+  tipsApi.getPremiumTips(new Date().toISOString().slice(0, 10))
+    .then((res) => setPremiumTips(res.data.slice(0, 3)))
+    .catch(() => setPremiumTips([]));
+}, []);
 
 
   const LEVEL_COLOR: Record<string, string> = {
