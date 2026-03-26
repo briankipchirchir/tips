@@ -17,7 +17,7 @@ interface Payment {
   amount: number;
   phoneNumber: string;
   planLevel: string;
-  duration: string;   // e.g. "ONE_WEEK", "ONE_MONTH", "THREE_MONTHS"
+  duration: string;
   status: string;
   createdAt: string;
   completedAt: string;
@@ -31,16 +31,15 @@ interface DerivedSub {
   isActive: boolean;
 }
 
-// Map duration string → days
 const DURATION_DAYS: Record<string, number> = {
-  ONE_DAY:       1,
-  THREE_DAYS:    3,
-  ONE_WEEK:      7,
-  TWO_WEEKS:     14,
-  ONE_MONTH:     30,
-  THREE_MONTHS:  90,
-  SIX_MONTHS:    180,
-  ONE_YEAR:      365,
+  ONE_DAY:      1,
+  THREE_DAYS:   3,
+  ONE_WEEK:     7,
+  TWO_WEEKS:    14,
+  ONE_MONTH:    30,
+  THREE_MONTHS: 90,
+  SIX_MONTHS:   180,
+  ONE_YEAR:     365,
 };
 
 const PLAN_BADGE: Record<string, string> = {
@@ -48,6 +47,22 @@ const PLAN_BADGE: Record<string, string> = {
   SILVER:   "badge-gray",
   GOLD:     "badge-gold",
   PLATINUM: "badge-purple",
+};
+
+/**
+ * Normalize any Kenyan phone format to +254XXXXXXXXX
+ * Handles: 0XXXXXXXXX, 254XXXXXXXXX, +254XXXXXXXXX, XXXXXXXXX (9 digits)
+ */
+const normalizePhone = (raw: string): string => {
+  if (!raw) return "";
+  const digits = raw.replace(/\D/g, ""); // strip everything non-numeric
+
+  if (digits.startsWith("254") && digits.length === 12) return `+${digits}`;
+  if (digits.startsWith("0")   && digits.length === 10) return `+254${digits.slice(1)}`;
+  if (digits.length === 9)                               return `+254${digits}`;
+  // already has + prefix
+  if (raw.startsWith("+254") && digits.length === 12)   return `+${digits}`;
+  return raw; // fallback — return as-is
 };
 
 const daysUntil = (dateStr: string) =>
@@ -71,18 +86,18 @@ const ExpiryCell = ({ sub }: { sub?: DerivedSub | null }) => {
   );
 };
 
-/** Build a map of phone → most recent active subscription derived from payments */
+/** Build map of normalized phone → most recent active subscription */
 const buildSubMap = (payments: Payment[]): Map<string, DerivedSub> => {
   const map = new Map<string, DerivedSub>();
 
-  // Only successful payments, newest first
   const successful = [...payments]
     .filter((p) => p.status === "SUCCESS")
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   for (const p of successful) {
-    const key = p.phoneNumber || p.user?.phone;
-    if (!key || map.has(key)) continue; // keep only the latest per phone
+    // Normalize the payment phone number
+    const key = normalizePhone(p.phoneNumber || p.user?.phone);
+    if (!key || map.has(key)) continue;
 
     const days      = DURATION_DAYS[p.duration] ?? 30;
     const startedAt = p.completedAt || p.createdAt;
@@ -115,8 +130,11 @@ const UsersManagement = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  // Normalize user phone when looking up in subMap
+  const getSub = (user: User) => subMap.get(normalizePhone(user.phone)) ?? null;
+
   const filtered = users.filter((u) => {
-    const sub = subMap.get(u.phone);
+    const sub = getSub(u);
 
     const matchSearch =
       u.fullName.toLowerCase().includes(search.toLowerCase()) ||
@@ -135,12 +153,12 @@ const UsersManagement = () => {
     return matchSearch && matchDate && matchPlan;
   });
 
-  const activeSubs  = users.filter((u) => subMap.get(u.phone)?.isActive).length;
+  const activeSubs  = users.filter((u) => getSub(u)?.isActive).length;
   const expiredSubs = users.filter((u) => {
-    const s = subMap.get(u.phone);
+    const s = getSub(u);
     return s && !s.isActive;
   }).length;
-  const noSub = users.filter((u) => !subMap.get(u.phone)).length;
+  const noSub = users.filter((u) => !getSub(u)).length;
 
   return (
     <AdminLayout title="Users Management">
@@ -260,7 +278,7 @@ const UsersManagement = () => {
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={7} style={{ textAlign: "center", color: "#64748b" }}>No users found</td></tr>
               ) : filtered.map((u) => {
-                const sub = subMap.get(u.phone);
+                const sub = getSub(u);
                 return (
                   <tr key={u.id}>
                     <td style={{ color: "#f1f5f9", fontWeight: 600 }}>{u.fullName}</td>
