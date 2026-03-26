@@ -50,6 +50,7 @@ body {
   padding: 100px 24px 80px;
   overflow: hidden;
   color: white;
+  background: #020617;
 }
 
 /* Goalkeeper background — set via inline style in TSX using imported asset */
@@ -57,11 +58,11 @@ body {
   position: absolute;
   inset: 0;
   background-size: cover;
-  background-position: center top;
+  background-position: center center;
   background-repeat: no-repeat;
-  opacity: 0.45;
+  opacity: 0.35;
   transform: scale(1.04);
-  filter: saturate(0.6);
+  filter: grayscale(0.3) brightness(0.5) contrast(1.2);
   z-index: 0;
 }
 
@@ -71,12 +72,12 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(34,197,94,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(34,197,94,0.05) 0%, transparent 70%),
     linear-gradient(180deg,
-      rgba(2,6,23,0.5) 0%,
-      rgba(2,6,23,0.2) 40%,
-      rgba(2,6,23,0.75) 80%,
-      rgba(2,6,23,1) 100%
+      rgba(2,6,23,0.6) 0%,
+      rgba(2,6,23,0.3) 35%,
+      rgba(2,6,23,0.55) 70%,
+      rgba(2,6,23,0.97) 100%
     );
   z-index: 1;
 }
