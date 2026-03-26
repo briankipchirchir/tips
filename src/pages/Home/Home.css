@@ -1128,3 +1128,112 @@ body {
 .overlay button:hover {
   transform: scale(1.05);
 }
+
+
+/* ─────────────────────────────────────────
+   FREE TIPS LIST
+───────────────────────────────────────── */
+.free-tips-list {
+  background: var(--navy-light);
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.free-tip-row {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+}
+
+.free-tip-row:last-child {
+  border-bottom: none;
+}
+
+.free-tip-row:hover {
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.free-tip-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.free-tip-time {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+.free-tip-league {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.free-tip-center {
+  min-width: 0;
+}
+
+.free-tip-fixture {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.free-tip-right {
+  flex-shrink: 0;
+}
+
+.free-tip-badge {
+  display: inline-block;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #22c55e;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .free-tip-row {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 6px 10px;
+    padding: 12px 14px;
+  }
+
+  .free-tip-left {
+    flex-direction: row;
+    gap: 8px;
+    grid-column: 1 / -1;
+  }
+
+  .free-tip-center {
+    grid-column: 1;
+  }
+
+  .free-tip-right {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+  }
+}

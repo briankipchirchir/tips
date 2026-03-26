@@ -222,59 +222,56 @@ const members = useCountUp(5000, 2000, statsVisible);
         </div>
       </div>
 
-      {/* ── FREE TIPS PREVIEW ── */}
-      <div className="section-wrapper">
-      <section className="section" id="free-tips">
-        <div className="section-header">
-          <h2 className="section-title" style={{ marginBottom: 0 }}>Free Guaranteed Tips</h2>
-          <Link to="/free-tips" className="filter-btn" style={{ textDecoration: 'none' }}>
-            View All →
-          </Link>
-        </div>
+    {/* ── FREE TIPS PREVIEW ── */}
+<div className="section-wrapper">
+  <section className="section" id="free-tips">
+    <div className="section-header">
+      <h2 className="section-title" style={{ marginBottom: 0 }}>Free Guaranteed Tips</h2>
+      <Link to="/free-tips" className="filter-btn" style={{ textDecoration: 'none' }}>
+        View All →
+      </Link>
+    </div>
 
-        <div className="filters" style={{ margin: '24px 0' }}>
-          {(["yesterday", "today", "tomorrow"] as const).map((d) => (
-            <button key={d} className={activeDay === d ? "active" : ""} onClick={() => setActiveDay(d)}>
-              {d.charAt(0).toUpperCase() + d.slice(1)}
-            </button>
-          ))}
-        </div>
+    <div className="filters" style={{ margin: '24px 0' }}>
+      {(["yesterday", "today", "tomorrow"] as const).map((d) => (
+        <button key={d} className={activeDay === d ? "active" : ""} onClick={() => setActiveDay(d)}>
+          {d.charAt(0).toUpperCase() + d.slice(1)}
+        </button>
+      ))}
+    </div>
 
-        {tipsLoading ? (
-          <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '20px' }}>Loading tips...</p>
-        ) : freeTips.length === 0 ? (
-          <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '20px' }}>
-            No free tips available for this day yet.
-          </p>
-        ) : (
-          <div style={{ background: 'var(--navy-light)', borderRadius: 'var(--radius)', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
-            <table className="tips-table">
-              <thead>
-                <tr>
-                  <th>Time</th><th>League</th><th>Fixture</th><th>Tip</th>
-                </tr>
-              </thead>
-              <tbody>
-                {freeTips.map((tip) => (
-                  <tr key={tip.id}>
-                    <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{tip.kickoffTime}</td>
-                    <td className="league">{tip.league}</td>
-                    <td className="fixture">{tip.fixture}</td>
-                    <td className="tip">{tip.prediction}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    {tipsLoading ? (
+      <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '20px' }}>Loading tips...</p>
+    ) : freeTips.length === 0 ? (
+      <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '20px' }}>
+        No free tips available for this day yet.
+      </p>
+    ) : (
+      <div className="free-tips-list">
+        {freeTips.map((tip) => (
+          <div key={tip.id} className="free-tip-row">
+            <div className="free-tip-left">
+              <span className="free-tip-time">{tip.kickoffTime}</span>
+              <span className="free-tip-league">{tip.league}</span>
+            </div>
+            <div className="free-tip-center">
+              <span className="free-tip-fixture">{tip.fixture}</span>
+            </div>
+            <div className="free-tip-right">
+              <span className="free-tip-badge">{tip.prediction}</span>
+            </div>
           </div>
-        )}
-
-        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-          <Link to="/free-tips" className="cta-link outline">
-            See All Free Tips →
-          </Link>
-        </div>
-      </section>
+        ))}
       </div>
+    )}
+
+    <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+      <Link to="/free-tips" className="cta-link outline">
+        See All Free Tips →
+      </Link>
+    </div>
+  </section>
+</div>
 
      {/* ── TODAY'S PREMIUM TIPS PREVIEW ── */}
 <div className="section-wrapper">
