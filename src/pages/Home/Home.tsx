@@ -241,30 +241,44 @@ const Home = () => {
       </section>
       </div>
 
-      {/* ── TODAY'S PREMIUM TIPS PREVIEW ── */}
-      <div className="section-wrapper">
-      <section className="section">
-        <div className="section-header">
-          <h2 className="section-title" style={{ marginBottom: 0 }}>Today's Premium Tips</h2>
-          <Link to="/premium-tips" className="filter-btn" style={{ textDecoration: 'none' }}>
-            View All →
-          </Link>
-        </div>
+     {/* ── TODAY'S PREMIUM TIPS PREVIEW ── */}
+<div className="section-wrapper">
+  <section className="section">
+    <div className="section-header">
+      <h2 className="section-title" style={{ marginBottom: 0 }}>
+        Today's Premium Tips
+      </h2>
+      <Link to="/premium-tips" className="filter-btn" style={{ textDecoration: 'none' }}>
+        View All →
+      </Link>
+    </div>
 
-        {premiumTips.length === 0 ? (
-          <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '20px', marginTop: '16px' }}>
-            No premium tips posted yet today.
-          </p>
-        ) : (
-          <div className="plans" style={{ marginTop: '24px' }}>
-            {premiumTips.map((tip) => (
-              <div
-                key={tip.id}
-                className="premium-card glow-card"
-                style={{ border: `1px solid ${LEVEL_COLOR[tip.level] || 'var(--glass-border)'}22` }}
-              >
+    <div className="plans" style={{ marginTop: '24px' }}>
+      {[0, 1].map((i) => {
+        const tip = premiumTips[i];
+
+        return (
+          <div
+            key={tip?.id || `placeholder-${i}`}
+            className={`premium-card glow-card ${!tip ? "placeholder" : ""}`}
+            style={{
+              border: `1px solid ${
+                tip
+                  ? LEVEL_COLOR[tip.level] || 'var(--glass-border)'
+                  : 'var(--glass-border)'
+              }22`,
+              opacity: tip ? 1 : 0.6,
+            }}
+          >
+            {tip ? (
+              <>
+                {/* HOT BADGE */}
                 <span className="hot-badge">🔥 HOT</span>
-                <span className={`plan-badge ${tip.level}`}>{tip.level}</span>
+
+                {/* PLAN BADGE */}
+                <span className={`plan-badge ${tip.level}`}>
+                  {tip.level}
+                </span>
 
                 {(userPlan === "NONE" ||
                   (tip.level === "GOLD" && userPlan === "SILVER") ||
@@ -284,24 +298,35 @@ const Home = () => {
                   </>
                 )}
 
+                {/* LOCK OVERLAY */}
                 {userPlan === "NONE" && (
                   <div className="overlay">
                     <p>🔒 Premium Tip</p>
-                    <button onClick={() => navigate('/subscribe')}>Subscribe to Unlock</button>
+                    <button onClick={() => navigate('/subscribe')}>
+                      Subscribe to Unlock
+                    </button>
                   </div>
                 )}
+              </>
+            ) : (
+              /* PLACEHOLDER CARD */
+              <div className="placeholder-content">
+                <p>⚡ New Tip Coming Soon</p>
+                <small>Stay tuned — updated daily</small>
               </div>
-            ))}
+            )}
           </div>
-        )}
+        );
+      })}
+    </div>
 
-        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <Link to="/premium-tips" className="cta-link outline">
-            View All Premium Tips →
-          </Link>
-        </div>
-      </section>
-      </div>
+    <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+      <Link to="/premium-tips" className="cta-link outline">
+        View All Premium Tips →
+      </Link>
+    </div>
+  </section>
+</div>
 
       {/* ── PREMIUM PLANS ── */}
       <section className="section dark" id="premium-plans">
