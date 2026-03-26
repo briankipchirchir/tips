@@ -59,7 +59,7 @@ body {
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
-  opacity: 0.18;
+  opacity: 0.45;
   transform: scale(1.04);
   filter: saturate(0.6);
   z-index: 0;
