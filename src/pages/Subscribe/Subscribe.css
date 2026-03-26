@@ -292,3 +292,82 @@
 }
 
 .sms-field input::placeholder { color: #475569; }
+
+
+/* ─────────────────────────────────────────
+   INTERNATIONAL BANNER
+───────────────────────────────────────── */
+.intl-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(37, 211, 102, 0.06);
+  border: 1px solid rgba(37, 211, 102, 0.2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.intl-banner-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.intl-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.intl-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0 0 3px;
+}
+
+.intl-sub {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.intl-wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25d366;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 50px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s, transform 0.2s;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.intl-wa-btn:hover {
+  background: #1ebe5d;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+  .intl-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .intl-wa-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

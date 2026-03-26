@@ -173,6 +173,33 @@ if (step === "failed") {
           <p className="sub-desc">Tips delivered instantly via SMS. Cancel anytime.</p>
         </div>
 
+      <div className="intl-banner">
+  <div className="intl-banner-left">
+    <span className="intl-icon">🌍</span>
+    <div>
+      <p className="intl-title">Outside Kenya?</p>
+      <p className="intl-sub">
+        M-Pesa is only available in Kenya. Contact us on WhatsApp to arrange payment.
+      </p>
+    </div>
+  </div>
+
+  <a
+    href="https://wa.me/254700000000?text=Hi%2C%20I%27d%20like%20to%20subscribe%20to%20a%20BetTips%20plan%20from%20outside%20Kenya."
+    target="_blank"
+    rel="noopener noreferrer"
+    className="intl-wa-btn"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.121 1.533 5.856L.057 23.5a.5.5 0 0 0 .623.622l5.588-1.461A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.9a9.893 9.893 0 0 1-5.031-1.373l-.36-.214-3.733.976.999-3.648-.235-.374A9.861 9.861 0 0 1 2.1 12C2.1 6.534 6.534 2.1 12 2.1S21.9 6.534 21.9 12 17.466 21.9 12 21.9z" />
+    </svg>
+    Chat on WhatsApp
+  </a>
+</div>
+
+        
+
         {/* Tab selector */}
         <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 28 }}>
           <button
