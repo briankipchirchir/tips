@@ -153,6 +153,16 @@ const members = useCountUp(5000, 2000, statsVisible);
           <button className="btn-outline" onClick={() => navigate("/subscribe")}>
             Subscribe Now
           </button>
+
+          {/* ✅ NEW WHATSAPP BUTTON */}
+  <a
+    href="https://chat.whatsapp.com/EloAMRPv85cEBC7EMeU8pD?mode=gi_t"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="btn-whatsapp"
+  >
+    💬 Join WhatsApp Group
+  </a>
         </div>
       </section>
 
